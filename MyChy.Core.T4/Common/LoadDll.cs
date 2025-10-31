@@ -205,7 +205,8 @@ namespace MyChy.Core.T4.Common
                     entity = new MyChyEntity
                     {
                         Name = i.Name,
-                        Description = i.ToDescription()
+                        Description = i.ToDescription(),
+                        Alias = i.Name,
                     };
                     if (i.BaseType == typeof(BaseWithAllEntity))
                     {
@@ -228,6 +229,10 @@ namespace MyChy.Core.T4.Common
                             else if (AttributeName == "AuthorityAttribute")
                             {
                                 entity.AuthorityCode = x.ConstructorArguments[0].Value.To<string>();
+                            }
+                            else if (AttributeName == "AliasAttribute")
+                            {
+                                entity.Alias = x.ConstructorArguments[0].Value.To<string>();
                             }
                             entity.CustomAttributeList.Add(AttributeName);
                         }

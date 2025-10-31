@@ -387,8 +387,10 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine($"/// 显示{x.Description}");
                     sb.AppendLine("/// </summary>");
                     sb.AppendLine("/// <returns></returns>");
-                    sb.AppendLine($"public async Task<IPagedList<{x.Name}>> Show{x.Name}PageAsync({x.Name}SearchModel Search, int pageSize = 15)");
+                    sb.AppendLine($"public async Task<IPagedList<{x.Name}>> Show{x.Name}PageAsync({x.Name}SearchModel Search, int pageSize = 10)");
                     sb.AppendLine("{");
+                    sb.AppendLine("if (Search.PageSize > 0) { pageSize = Search.PageSize; }");
+                    sb.AppendLine("if (Search.Pageid <= 0) { Search.Pageid = 1; }");
                     sb.AppendLine($"var predicate = PredicateBuilder.New<{x.Name}>();");
                     sb.AppendLine($"if (!string.IsNullOrEmpty(Search.Keyword))");
                     sb.AppendLine("{");
@@ -540,17 +542,29 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine(")");
 
                     sb.AppendLine("{");
-                    sb.AppendLine($"var result = mapper.Map<IEnumerable<{x.Name}>, IEnumerable<{x.Name}PostModel>>(list);");
-                    sb.AppendLine("foreach (var i in result)");
-                    sb.AppendLine("{");
-                    sb.Append($" Conversion{x.Name}(i");
+                    //sb.AppendLine($"var result = mapper.Map<IEnumerable<{x.Name}>, IEnumerable<{x.Name}PostModel>>(list);");
+                    //sb.AppendLine("foreach (var i in result)");
+                    //sb.AppendLine("{");
+                    //sb.Append($" Conversion{x.Name}(i");
+                    //if (x.IsThumbnail)
+                    //{
+                    //    sb.Append($", thumbnailModel");
+                    //}
+                    //sb.AppendLine($" );");
+
+                    //sb.AppendLine("}");
+                    sb.AppendLine($"            var result = new List<{x.Name}PostModel>();");
+                    sb.AppendLine("            foreach (var i in list)");
+                    sb.AppendLine("            {");
+                    sb.Append($"                result.Add(Conversion{x.Name}(i");
                     if (x.IsThumbnail)
                     {
                         sb.Append($", thumbnailModel");
                     }
-                    sb.AppendLine($" );");
+                    sb.AppendLine($" ));");
 
-                    sb.AppendLine("}");
+                    sb.AppendLine("            }");
+
                     sb.AppendLine($"return result.ToList();");
                     sb.AppendLine("}");
 
@@ -564,324 +578,309 @@ namespace MyChy.Core.T4.Template
                         sb.Append($"public {x.Name}PostModel Conversion{x.Name}({x.Name} Model");
                         if (x.IsThumbnail)
                         {
-                            sb.Append($",ThumbnailModel thumbnailModel=null");
+                            sb.Append(",ThumbnailModel thumbnailModel=null");
                         }
-                        sb.AppendLine($")");
+                        sb.Append(")");
                         sb.AppendLine("{");
-                        sb.AppendLine($"var result =  mapper.Map<{x.Name}, {x.Name}PostModel>(Model);");
+
                         if (x.IsThumbnail)
                         {
                             sb.AppendLine("if (thumbnailModel == null) { thumbnailModel = new ThumbnailModel() { Width = 200, Height = 400 }; }");
                         }
-                        sb.AppendLine($"return Conversion{x.Name}(result");
-                        if (x.IsThumbnail)
-                        {
-                            sb.AppendLine($", thumbnailModel");
-                        }
-                        sb.AppendLine($");");
-                        sb.AppendLine("}");
-                    }
-
-                    sb.AppendLine(" ");
-                    sb.AppendLine("/// <summary>");
-                    sb.AppendLine($"/// 转化{x.Description}");
-                    sb.AppendLine("/// </summary>");
-                    sb.AppendLine("/// <returns></returns>");
-                    sb.AppendLine($"private {x.Name}PostModel Conversion{x.Name}({x.Name}PostModel Model");
-                    if (x.IsThumbnail)
-                    {
-                        sb.Append($",ThumbnailModel thumbnailModel=null");
-                    }
-                    sb.Append($" )");
-                    sb.AppendLine("{");
-                    sb.AppendLine("if (Model?.Id > 0)");
-                    sb.AppendLine("{");
-                    if (isPicture)
-                    {
-                        sb.AppendLine("if (!string.IsNullOrEmpty(Model.Picture))");
+                        sb.AppendLine($"var result = new {x.Name}PostModel();");
+                        sb.AppendLine("if (Model?.Id > 0)");
                         sb.AppendLine("{");
-                        if (x.IsThumbnail)
+                        sb.AppendLine($"result = _mapper.Map<{x.Name}, {x.Name}PostModel>(Model);");
+                        if (isPicture)
                         {
-                            sb.AppendLine("Model.PictureShow = CommonServer.PictureShow(Model.Picture, uploadConfig.PictureService, thumbnailModel);");
-                        }
-                        else
-                        {
-                            sb.AppendLine("Model.PictureShow =CommonServer.PictureHref(Model.Picture, uploadConfig.PictureService);");
-                        }
-                        sb.AppendLine("Model.PictureHref = CommonServer.PictureHref(Model.Picture, uploadConfig.PictureService);");
-                        sb.AppendLine("}");
-                    }
-                    foreach (var y in x.Attributes)
-                    {
-                        if (y.Types0f == "Enum")
-                        {
-                            sb.AppendLine($"Model.{y.Name}Show = (({y.EnumName})Model.{y.Name}).ToDescription();");
-                            //sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
-                        }
-                        else if (y.Types0f == "Attributes")
-                        {
-                            switch (y.AttributeName)
+                            sb.AppendLine("if (!string.IsNullOrEmpty(result.Picture))");
+                            sb.AppendLine("{");
+                            if (x.IsThumbnail)
                             {
-                                case "EnumListStringAttribute":
-                                    sb.Append($"Model.{y.Name}Show = ");
-                                    sb.Append($"expandsService.ShowEnumListVualeByCodingCacheAsync");
-                                    sb.AppendLine($"(\"{y.AttributeCode}\",Model.{y.Name}).Result;");
-                                    break;
-                                case "TableToAttribute":
-                                    sb.AppendLine($"if (Model.{y.Name}>0)");
-                                    sb.AppendLine("{");
-                                    if (y.AttributeTwo == "BaseArea" || string.IsNullOrEmpty(y.AttributeTwo))
-                                    {
-                                        sb.Append($"var info = Show{y.AttributeOne}CacheAsync (new {y.AttributeOne}SearchModel() ");
-                                        sb.Append("{ Id =");
-                                        sb.Append($" Model.{y.Name}");
-                                        sb.AppendLine("}).Result;");
-                                    }
-                                    else
-                                    {
-                                        sb.Append($"var info = {y.AttributeTwo.ToLower()}Service.Show{y.AttributeOne}CacheAsync (new {y.AttributeOne}SearchModel() ");
-                                        sb.Append("{ Id =");
-                                        sb.Append($" Model.{y.Name}");
-                                        sb.AppendLine("}).Result;");
-
-                                    }
-                                    sb.Append($"if (info?.Id > 0) Model.{y.Name}Show = info.{y.AttributeThree}; ");
-
-                                    sb.AppendLine("}");
-
-                                    break;
+                                sb.AppendLine("result.PictureShow = CommonServer.PictureShow(result.Picture, uploadConfig.PictureService, thumbnailModel);");
                             }
-                        }
-                        else if (y.Types0f == "DateTime")
-                        {
-                            sb.AppendLine($"Model.{y.Name}Show = Model.{y.Name}.ToString(\"yyyy-MM-dd\");");
-                        }
-
-                    }
-                    sb.AppendLine("}");
-                    sb.AppendLine($"return Model;");
-                    sb.AppendLine("}");
-
-                    if (!x.IsViewEntity)
-                    {
-                        sb.AppendLine(" ");
-                        sb.AppendLine("/// <summary>");
-                        sb.AppendLine($"/// 保存{x.Description}{x.Description}");
-                        sb.AppendLine("/// </summary>");
-                        sb.AppendLine("/// <returns></returns>");
-                        sb.AppendLine($"public async Task<ResultBaseModel> Save{x.Name}PostAsync({x.Name}PostModel PostModel, string DefUserName = \"SyStem\")");
-                        sb.AppendLine("{");
-                        sb.AppendLine("var result = new ResultBaseModel();");
-                        sb.AppendLine("try");
-                        sb.AppendLine("{");
-
-
-                        sb.AppendLine($"//var counts = _{i.Namespace}Work.{x.Name}R.QueryNoTracking().Where(x => x.Title == PostModel.Title && x.Id != PostModel.Id).Count();");
-                        sb.AppendLine("//if (counts > 0) { result.Msg = \"名称相同，请修改名称\"; return result; }");
-
-                        sb.AppendLine("var userinfo =  AdminIdentityServer.AccountUserid();");
-                        sb.AppendLine("if (userinfo?.UserId > 0) DefUserName = $\"{userinfo.UserNick}-{userinfo.UserName}\";");
-
-                        sb.AppendLine($"var model = new {x.Name}();");
-                        sb.AppendLine("if (PostModel.Id > 0)");
-                        sb.AppendLine("{");
-                        sb.AppendLine($"model = await _{i.Namespace}Work.{x.Name}R.GetByIdAsync(PostModel.Id);");
-                        if (x.IsBaseWithAllEntity)
-                        {
-                            sb.AppendLine("model.UpdatedBy = DefUserName;");
-                            sb.AppendLine("model.UpdatedOn = DateTime.Now;");
+                            else
+                            {
+                                sb.AppendLine("result.PictureShow =CommonServer.PictureHref(Model.Picture, uploadConfig.PictureService);");
+                            }
+                            sb.AppendLine("result.PictureHref = CommonServer.PictureHref(Model.Picture, uploadConfig.PictureService);");
+                            sb.AppendLine("}");
                         }
                         foreach (var y in x.Attributes)
                         {
                             if (y.Types0f == "Enum")
                             {
-                                sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
+                                sb.AppendLine($"result.{y.Name}Show =  Model.{y.Name}.ToDescription();;");
+                                //sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
+                            }
+                            else if (y.Types0f == "Attributes")
+                            {
+                                switch (y.AttributeName)
+                                {
+                                    case "EnumListStringAttribute":
+                                        sb.Append($"result.{y.Name}Show = ");
+                                        sb.Append($"expandsService.ShowEnumListVualeByCodingCacheAsync");
+                                        sb.AppendLine($"(\"{y.AttributeCode}\",Model.{y.Name}).Result;");
+                                        break;
+                                    case "TableToAttribute":
+                                        sb.AppendLine($"if (Model.{y.Name}>0)");
+                                        sb.AppendLine("{");
+                                        if (y.AttributeTwo == "BaseArea" || string.IsNullOrEmpty(y.AttributeTwo))
+                                        {
+                                            sb.Append($"var info = Show{y.AttributeOne}CacheAsync (new {y.AttributeOne}SearchModel() ");
+                                            sb.Append("{ Id =");
+                                            sb.Append($" Model.{y.Name}");
+                                            sb.AppendLine("}).Result;");
+                                        }
+                                        else
+                                        {
+                                            sb.Append($"var info = {y.AttributeTwo.ToLower()}Service.Show{y.AttributeOne}CacheAsync (new {y.AttributeOne}SearchModel() ");
+                                            sb.Append("{ Id =");
+                                            sb.Append($" Model.{y.Name}");
+                                            sb.AppendLine("}).Result;");
+
+                                        }
+                                        sb.Append($"if (info?.Id > 0) result.{y.Name}Show = info.{y.AttributeThree}; ");
+
+                                        sb.AppendLine("}");
+
+                                        break;
+                                }
+                            }
+                            else if (y.Types0f == "DateTime")
+                            {
+                                sb.AppendLine($"result.{y.Name}Show = Model.{y.Name}.ToString(\"yyyy-MM-dd\");");
+                            }
+
+                        }
+
+                        sb.AppendLine("}");
+                        sb.AppendLine("return result;");
+
+                        sb.AppendLine("}");
+
+                        if (!x.IsViewEntity)
+                        {
+                            sb.AppendLine(" ");
+                            sb.AppendLine("/// <summary>");
+                            sb.AppendLine($"/// 保存{x.Description}{x.Description}");
+                            sb.AppendLine("/// </summary>");
+                            sb.AppendLine("/// <returns></returns>");
+                            sb.AppendLine($"public async Task<ResultBaseModel> Save{x.Name}PostAsync({x.Name}PostModel PostModel, string DefUserName = \"SyStem\")");
+                            sb.AppendLine("{");
+                            sb.AppendLine("var result = new ResultBaseModel();");
+                            sb.AppendLine("try");
+                            sb.AppendLine("{");
+
+
+                            sb.AppendLine($"//var counts = _{i.Namespace}Work.{x.Name}R.QueryNoTracking().Where(x => x.Title == PostModel.Title && x.Id != PostModel.Id).Count();");
+                            sb.AppendLine("//if (counts > 0) { result.Msg = \"名称相同，请修改名称\"; return result; }");
+
+                            sb.AppendLine("var userinfo =  AdminIdentityServer.AccountUserid();");
+                            sb.AppendLine("if (userinfo?.UserId > 0) DefUserName = $\"{userinfo.UserNick}-{userinfo.UserName}\";");
+
+                            sb.AppendLine($"var model = new {x.Name}();");
+                            sb.AppendLine("if (PostModel.Id > 0)");
+                            sb.AppendLine("{");
+                            sb.AppendLine($"model = await _{i.Namespace}Work.{x.Name}R.GetByIdAsync(PostModel.Id);");
+                            if (x.IsBaseWithAllEntity)
+                            {
+                                sb.AppendLine("model.UpdatedBy = DefUserName;");
+                                sb.AppendLine("model.UpdatedOn = DateTime.Now;");
+                            }
+                            foreach (var y in x.Attributes)
+                            {
+                                if (y.Types0f == "Enum")
+                                {
+                                    sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
+                                }
+                                else
+                                {
+                                    sb.AppendLine($"model.{y.Name} = PostModel.{y.Name};");
+                                }
+                            }
+
+                            sb.AppendLine("}");
+                            sb.AppendLine("else");
+                            sb.AppendLine("{");
+                            sb.AppendLine($"model = mapper.Map<{x.Name}PostModel, {x.Name}>(PostModel);");
+                            if (x.IsBaseWithAllEntity)
+                            {
+                                sb.AppendLine("model.CreatedOn = DateTime.Now;");
+                                sb.AppendLine("model.CreatedBy = DefUserName;");
+                            }
+
+                            sb.AppendLine("}");
+                            sb.AppendLine("if (model.Id > 0)");
+                            sb.AppendLine("{");
+                            sb.AppendLine($"_{i.Namespace}Work.{x.Name}R.Update(model);");
+
+                            if (x.CustomAttributeList.Contains("AuditIncludeAttribute"))
+                            {
+                                sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAutoHistoryAsync(DefUserName);");
                             }
                             else
                             {
-                                sb.AppendLine($"model.{y.Name} = PostModel.{y.Name};");
+                                sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
                             }
-                        }
 
-                        sb.AppendLine("}");
-                        sb.AppendLine("else");
-                        sb.AppendLine("{");
-                        sb.AppendLine($"model = mapper.Map<{x.Name}PostModel, {x.Name}>(PostModel);");
-                        if (x.IsBaseWithAllEntity)
-                        {
-                            sb.AppendLine("model.CreatedOn = DateTime.Now;");
-                            sb.AppendLine("model.CreatedBy = DefUserName;");
-                        }
-
-                        sb.AppendLine("}");
-                        sb.AppendLine("if (model.Id > 0)");
-                        sb.AppendLine("{");
-                        sb.AppendLine($"_{i.Namespace}Work.{x.Name}R.Update(model);");
-
-                        if (x.CustomAttributeList.Contains("AuditIncludeAttribute"))
-                        {
-                            sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAutoHistoryAsync(DefUserName);");
-                        }
-                        else
-                        {
+                            sb.Append($"var Search=new {x.Name}SearchModel()");
+                            sb.AppendLine("{ Id=model.Id };");
+                            sb.AppendLine($"Remove{x.Name}CacheAsync(Search, CacheKeyType.Model);");
+                            sb.AppendLine("}");
+                            sb.AppendLine("else");
+                            sb.AppendLine("{");
+                            sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.AddAsync(model);");
                             sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
+                            sb.AppendLine("}");
+
+                            sb.AppendLine("result.Id = model.Id;");
+                            sb.AppendLine("result.Success = true;");
+                            sb.Append($"Remove{x.Name}CacheAsync(new {x.Name}SearchModel() ");
+                            sb.AppendLine("{ State = true }, CacheKeyType.List);");
+
+                            sb.AppendLine("}");
+                            sb.AppendLine("catch (Exception ex)");
+                            sb.AppendLine("{");
+
+                            sb.AppendLine(" var LogError = new LogErrorObjectModel()");
+                            sb.AppendLine("{");
+                            sb.AppendLine("   EnterParameters = PostModel,");
+                            sb.AppendLine("   ExceptionResults = ex,");
+                            sb.AppendLine($"  Name = \"{i.Namespace}Service\",");
+                            sb.AppendLine("   Operator = DefUserName,");
+                            sb.AppendLine($"   Method = \"Save{x.Name}PostAsync\",");
+                            sb.AppendLine(" };");
+
+                            sb.AppendLine(" await logsService.SaveLogErrorAsync(LogError);");
+
+                            sb.AppendLine(" result.Success = false;");
+                            sb.AppendLine(" result.Msg = ex.Message;");
+
+
+
+
+                            sb.AppendLine("}");
+
+                            sb.AppendLine("return result;");
+                            sb.AppendLine("}");
+
+
+                            sb.AppendLine(" ");
+                            sb.AppendLine("/// <summary>");
+                            sb.AppendLine($"/// 批量保存{x.Description}");
+                            sb.AppendLine("/// </summary>");
+                            sb.AppendLine("/// <returns></returns>");
+                            sb.AppendLine($"public async Task<ResultBaseModel> Save{x.Name}ListAsync(IList<{x.Name}> List)");
+                            sb.AppendLine("{");
+                            sb.AppendLine("var result = new ResultBaseModel();");
+                            sb.AppendLine($"result = await _{i.Namespace}Work.{x.Name}R.AddBulkCopyAsync(List);");
+                            //sb.AppendLine($"result.Id = List.Count;");
+
+                            sb.AppendLine("//foreach (var i in List)");
+                            sb.AppendLine("//{");
+                            sb.AppendLine($"//    await _{i.Namespace}Work.{x.Name}R.AddAsync(i);");
+                            sb.AppendLine("//}");
+                            sb.AppendLine($"//await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
+                            sb.AppendLine("//result.Success = true;");
+                            sb.AppendLine("return result;");
+                            sb.AppendLine("}");
+                            sb.AppendLine(" ");
+
+
+                            sb.AppendLine(" ");
+                            sb.AppendLine("/// <summary>");
+                            sb.AppendLine($"/// 删除{x.Description}");
+                            sb.AppendLine("/// </summary>");
+                            sb.AppendLine("/// <param name=\"Search\"></param>");
+                            sb.AppendLine("/// <returns></returns>");
+                            sb.AppendLine($"public async Task<ResultBaseModel> Delete{x.Name}PostAsync({x.Name}SearchModel Search)");
+                            sb.AppendLine("{");
+                            sb.AppendLine("var result = new ResultBaseModel();");
+                            sb.AppendLine("var userinfo = AdminIdentityServer.AccountUserid();");
+
+                            sb.AppendLine($"var Model = await _{i.Namespace}Work.{x.Name}R.GetByIdAsync(Search.Id);");
+
+                            if (x.IsBaseWithAllEntity)
+                            {
+                                sb.AppendLine("Model.IsDeleted = true;");
+                                sb.AppendLine("Model.DeletedBy = $\"{userinfo.UserNick}-{userinfo.UserName}\";");
+                                sb.AppendLine("Model.DeletedOn = DateTime.Now;");
+                            }
+
+                            sb.AppendLine($"_{i.Namespace}Work.{x.Name}R.Update(Model);");
+                            sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
+                            sb.AppendLine("result.Id = Search.Id;");
+                            sb.AppendLine("result.Success = true;");
+                            sb.AppendLine($"Remove{x.Name}CacheAsync(Search, CacheKeyType.Model);");
+                            sb.AppendLine("return result;");
+                            sb.AppendLine("}");
+                            sb.AppendLine(" ");
+
+
+                            sb.AppendLine(" ");
+                            sb.AppendLine("/// <summary>");
+                            sb.AppendLine($"/// 移除{x.Description}缓存信息");
+                            sb.AppendLine("/// </summary>");
+                            sb.AppendLine("/// <param name=\"\"></param>");
+                            sb.AppendLine("/// <returns></returns>");
+                            sb.AppendLine($"public void Remove{x.Name}CacheAsync({x.Name}SearchModel Search,CacheKeyType cacheKeyType)");
+                            sb.AppendLine("{");
+                            sb.AppendLine($"var key =Show{x.Name}CacheKey(Search,cacheKeyType);");
+                            sb.AppendLine("generalCacheServer.Remove(key);");
+                            sb.AppendLine($"//Remove{x.Name}ListCacheAsync(Search);");
+                            sb.AppendLine("}");
+                            sb.AppendLine(" ");
+
+
+
+
+                            //sb.AppendLine(" ");
+                            //sb.AppendLine("/// <summary>");
+                            //sb.AppendLine($"/// 移除{x.Description}缓存信息");
+                            //sb.AppendLine("/// </summary>");
+                            //sb.AppendLine("/// <param name=\"\"></param>");
+                            //sb.AppendLine("/// <returns></returns>");
+                            //sb.AppendLine($"public void Remove{x.Name}ListCacheAsync({x.Name}SearchModel Search)");
+                            //sb.AppendLine("{");
+                            //sb.AppendLine($"var key =Show{x.Name}CacheKey(Search,CacheKeyType.List);");
+                            //sb.AppendLine("generalCacheServer.Remove(key);");
+                            //sb.AppendLine("}");
+                            //sb.AppendLine(" ");
+
+                            sb.AppendLine(" ");
+                            sb.AppendLine("/// <summary> ");
+                            sb.AppendLine("/// 显示缓存Key ");
+                            sb.AppendLine("/// </summary> ");
+                            sb.AppendLine("/// <param name=\"Search\"></param> ");
+                            sb.AppendLine("/// <param name=\"cache\"></param> ");
+                            sb.AppendLine("/// <returns></returns> ");
+                            sb.AppendLine($"private string Show{x.Name}CacheKey({x.Name}SearchModel Search, CacheKeyType cache) ");
+                            sb.AppendLine("{ ");
+                            sb.AppendLine("var key = string.Empty; ");
+                            sb.AppendLine("switch (cache) ");
+                            sb.AppendLine("{ ");
+                            sb.AppendLine("case CacheKeyType.Model: ");
+                            sb.Append(" key =$\"{CacheKey}");
+                            sb.Append($"Show{x.Name}ByCacheAsync");
+                            sb.AppendLine("_{Search.Id}\";");
+                            sb.AppendLine("break; ");
+                            sb.AppendLine("case CacheKeyType.List: ");
+                            sb.Append(" key =$\"{CacheKey}");
+                            sb.AppendLine($"Show{x.Name}ListCacheAsync\";");
+                            sb.AppendLine(" break; ");
+                            sb.AppendLine("case CacheKeyType.Page: ");
+                            sb.Append(" key =$\"{CacheKey}");
+                            sb.AppendLine($"Show{x.Name}PageCacheAsync\";");
+                            sb.AppendLine("break; ");
+                            sb.AppendLine("} ");
+                            sb.AppendLine("return key; ");
+                            sb.AppendLine("} ");
+
                         }
-
-                        sb.Append($"var Search=new {x.Name}SearchModel()");
-                        sb.AppendLine("{ Id=model.Id };");
-                        sb.AppendLine($"Remove{x.Name}CacheAsync(Search, CacheKeyType.Model);");
-                        sb.AppendLine("}");
-                        sb.AppendLine("else");
-                        sb.AppendLine("{");
-                        sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.AddAsync(model);");
-                        sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
-                        sb.AppendLine("}");
-
-                        sb.AppendLine("result.Id = model.Id;");
-                        sb.AppendLine("result.Success = true;");
-                        sb.Append($"Remove{x.Name}CacheAsync(new {x.Name}SearchModel() ");
-                        sb.AppendLine("{ State = true }, CacheKeyType.List);");
-
-                        sb.AppendLine("}");
-                        sb.AppendLine("catch (Exception ex)");
-                        sb.AppendLine("{");
-
-                        sb.AppendLine(" var LogError = new LogErrorObjectModel()");
-                        sb.AppendLine("{");
-                        sb.AppendLine("   EnterParameters = PostModel,");
-                        sb.AppendLine("   ExceptionResults = ex,");
-                        sb.AppendLine($"  Name = \"{i.Namespace}Service\",");
-                        sb.AppendLine("   Operator = DefUserName,");
-                        sb.AppendLine($"   Method = \"Save{x.Name}PostAsync\",");
-                        sb.AppendLine(" };");
-
-                        sb.AppendLine(" await logsService.SaveLogErrorAsync(LogError);");
-
-                        sb.AppendLine(" result.Success = false;");
-                        sb.AppendLine(" result.Msg = ex.Message;");
-
-                        
-                        
-
-                        sb.AppendLine("}");
-
-                        sb.AppendLine("return result;");
-                        sb.AppendLine("}");
-
-
-                        sb.AppendLine(" ");
-                        sb.AppendLine("/// <summary>");
-                        sb.AppendLine($"/// 批量保存{x.Description}");
-                        sb.AppendLine("/// </summary>");
-                        sb.AppendLine("/// <returns></returns>");
-                        sb.AppendLine($"public async Task<ResultBaseModel> Save{x.Name}ListAsync(IList<{x.Name}> List)");
-                        sb.AppendLine("{");
-                        sb.AppendLine("var result = new ResultBaseModel();");
-                        sb.AppendLine($"result = await _{i.Namespace}Work.{x.Name}R.AddBulkCopyAsync(List);");
-                        //sb.AppendLine($"result.Id = List.Count;");
-
-                        sb.AppendLine("//foreach (var i in List)");
-                        sb.AppendLine("//{");
-                        sb.AppendLine($"//    await _{i.Namespace}Work.{x.Name}R.AddAsync(i);");
-                        sb.AppendLine("//}");
-                        sb.AppendLine($"//await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
-                        sb.AppendLine("//result.Success = true;");
-                        sb.AppendLine("return result;");
-                        sb.AppendLine("}");
-                        sb.AppendLine(" ");
-
-
-                        sb.AppendLine(" ");
-                        sb.AppendLine("/// <summary>");
-                        sb.AppendLine($"/// 删除{x.Description}");
-                        sb.AppendLine("/// </summary>");
-                        sb.AppendLine("/// <param name=\"Search\"></param>");
-                        sb.AppendLine("/// <returns></returns>");
-                        sb.AppendLine($"public async Task<ResultBaseModel> Delete{x.Name}PostAsync({x.Name}SearchModel Search)");
-                        sb.AppendLine("{");
-                        sb.AppendLine("var result = new ResultBaseModel();");
-                        sb.AppendLine("var userinfo = AdminIdentityServer.AccountUserid();");
-
-                        sb.AppendLine($"var Model = await _{i.Namespace}Work.{x.Name}R.GetByIdAsync(Search.Id);");
-
-                        if (x.IsBaseWithAllEntity)
-                        {
-                            sb.AppendLine("Model.IsDeleted = true;");
-                            sb.AppendLine("Model.DeletedBy = $\"{userinfo.UserNick}-{userinfo.UserName}\";");
-                            sb.AppendLine("Model.DeletedOn = DateTime.Now;");
-                        }
-
-                        sb.AppendLine($"_{i.Namespace}Work.{x.Name}R.Update(Model);");
-                        sb.AppendLine($"await _{i.Namespace}Work.{x.Name}R.CommitAsync();");
-                        sb.AppendLine("result.Id = Search.Id;");
-                        sb.AppendLine("result.Success = true;");
-                        sb.AppendLine($"Remove{x.Name}CacheAsync(Search, CacheKeyType.Model);");
-                        sb.AppendLine("return result;");
-                        sb.AppendLine("}");
-                        sb.AppendLine(" ");
-
-
-                        sb.AppendLine(" ");
-                        sb.AppendLine("/// <summary>");
-                        sb.AppendLine($"/// 移除{x.Description}缓存信息");
-                        sb.AppendLine("/// </summary>");
-                        sb.AppendLine("/// <param name=\"\"></param>");
-                        sb.AppendLine("/// <returns></returns>");
-                        sb.AppendLine($"public void Remove{x.Name}CacheAsync({x.Name}SearchModel Search,CacheKeyType cacheKeyType)");
-                        sb.AppendLine("{");
-                        sb.AppendLine($"var key =Show{x.Name}CacheKey(Search,cacheKeyType);");
-                        sb.AppendLine("generalCacheServer.Remove(key);");
-                        sb.AppendLine($"//Remove{x.Name}ListCacheAsync(Search);");
-                        sb.AppendLine("}");
-                        sb.AppendLine(" ");
-
-
-
-
-                        //sb.AppendLine(" ");
-                        //sb.AppendLine("/// <summary>");
-                        //sb.AppendLine($"/// 移除{x.Description}缓存信息");
-                        //sb.AppendLine("/// </summary>");
-                        //sb.AppendLine("/// <param name=\"\"></param>");
-                        //sb.AppendLine("/// <returns></returns>");
-                        //sb.AppendLine($"public void Remove{x.Name}ListCacheAsync({x.Name}SearchModel Search)");
-                        //sb.AppendLine("{");
-                        //sb.AppendLine($"var key =Show{x.Name}CacheKey(Search,CacheKeyType.List);");
-                        //sb.AppendLine("generalCacheServer.Remove(key);");
-                        //sb.AppendLine("}");
-                        //sb.AppendLine(" ");
-
-                        sb.AppendLine(" ");
-                        sb.AppendLine("/// <summary> ");
-                        sb.AppendLine("/// 显示缓存Key ");
-                        sb.AppendLine("/// </summary> ");
-                        sb.AppendLine("/// <param name=\"Search\"></param> ");
-                        sb.AppendLine("/// <param name=\"cache\"></param> ");
-                        sb.AppendLine("/// <returns></returns> ");
-                        sb.AppendLine($"private string Show{x.Name}CacheKey({x.Name}SearchModel Search, CacheKeyType cache) ");
-                        sb.AppendLine("{ ");
-                        sb.AppendLine("var key = string.Empty; ");
-                        sb.AppendLine("switch (cache) ");
-                        sb.AppendLine("{ ");
-                        sb.AppendLine("case CacheKeyType.Model: ");
-                        sb.Append(" key =$\"{CacheKey}");
-                        sb.Append($"Show{x.Name}ByCacheAsync");
-                        sb.AppendLine("_{Search.Id}\";");
-                        sb.AppendLine("break; ");
-                        sb.AppendLine("case CacheKeyType.List: ");
-                        sb.Append(" key =$\"{CacheKey}");
-                        sb.AppendLine($"Show{x.Name}ListCacheAsync\";");
-                        sb.AppendLine(" break; ");
-                        sb.AppendLine("case CacheKeyType.Page: ");
-                        sb.Append(" key =$\"{CacheKey}");
-                        sb.AppendLine($"Show{x.Name}PageCacheAsync\";");
-                        sb.AppendLine("break; ");
-                        sb.AppendLine("} ");
-                        sb.AppendLine("return key; ");
-                        sb.AppendLine("} ");
-
+                        sb.AppendLine("#endregion");
                     }
-                    sb.AppendLine("#endregion");
+
                 }
                 sb.AppendLine("}");
 

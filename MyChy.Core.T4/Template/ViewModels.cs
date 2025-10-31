@@ -12,9 +12,6 @@ namespace MyChy.Core.T4.Template
     {
         private const string IPath = "/MyChy.Web.ViewModels/Database";
 
-
-
-
         /// <summary>
         /// 输出模板
         /// </summary>
@@ -55,21 +52,17 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine("using MyChy.Frame.Core.Common.Model;");
                     sb.AppendLine("using MyChy.Plugin.Models.Cache;");
                     sb.AppendLine($"namespace MyChy.Web.ViewModels.{i.Namespace}");
+                    sb.AppendLine($"namespace MyChy.Web.ViewModels.AdminVue");
                     sb.AppendLine("{");
 
-                    sb.AppendLine($"public class {x.Name}ViewModel : BaseViewModel");
-                    sb.AppendLine("{");
-                    sb.Append($"public IPagedList<{x.Name}PostModel> List ");
-                    sb.AppendLine("{ get; set; }");
-                    sb.Append($"public {x.Name}SearchModel Search ");
-                    sb.AppendLine("{ get; set; }");
-                    sb.AppendLine("public string? Title { get; set; }");
-                    sb.AppendLine("}");
-
+                    sb.AppendLine($"    public class {x.Name}IndexViewModel : TableVueReqly");
+                    sb.AppendLine("    {");
+                    sb.AppendLine("");
+                    sb.AppendLine("    }");
 
                     sb.AppendLine($"public class {x.Name}PostViewModel : BaseViewModel");
                     sb.AppendLine("{");
-                    sb.Append($"public {x.Name}PostModel Post ");
+                    sb.Append($"public {x.Name}PostModel PostModel ");
                     sb.AppendLine("{ get; set; }");
 
                     foreach (var y in x.Attributes)
@@ -79,15 +72,26 @@ namespace MyChy.Core.T4.Template
                             switch (y.AttributeName)
                             {
                                 case "EnumListStringAttribute":
-                                    sb.Append($"public ICollection<SelectListItem> {y.Name}Select ");
+                                    sb.Append($"public ICollection<HtmlSelectOption>? {y.Name}Select ");
                                     sb.AppendLine("{ get; set; }");
+
+                                    sb.Append($"public ICollection<string>? {y.Name}s ");
+                                    sb.AppendLine("{ get; set; }");
+
                                     break;
                                 case "EnumListCheckAttribute":
-                                    sb.Append($"public ICollection<SelectListItem> {y.Name}Select ");
+                                    sb.Append($"public ICollection<HtmlSelectOption> {y.Name}Select ");
                                     sb.AppendLine("{ get; set; }");
+
+                                    sb.Append($"public ICollection<string>? {y.Name}s ");
+                                    sb.AppendLine("{ get; set; }");
+
                                     break;
                                 case "TableToAttribute":
-                                    sb.Append($"public ICollection<SelectListItem> {y.Name}Select ");
+                                    sb.Append($"public ICollection<HtmlSelectOption>? {y.Name}Select ");
+                                    sb.AppendLine("{ get; set; }");
+
+                                    sb.Append($"public ICollection<string>? {y.Name}s ");
                                     sb.AppendLine("{ get; set; }");
                                     break;
 
@@ -178,7 +182,7 @@ namespace MyChy.Core.T4.Template
                     }
                     sb.AppendLine("}");
 
-                    sb.AppendLine($"public class {x.Name}SearchModel : BaseSearchModel");
+                    sb.AppendLine($"public class {x.Name}SearchModel : BaseSearchRequest");
                     sb.AppendLine("{");
 
                     //foreach (var y in x.Attributes)

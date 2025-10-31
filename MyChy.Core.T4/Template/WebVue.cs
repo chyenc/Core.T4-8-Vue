@@ -55,11 +55,11 @@ public class WebVue
         sb.AppendLine("//-------------------接口地址-------------------");
         foreach (var entity in i.FileName)
         {
-            sb.AppendLine($"//-------------------接口「{entity.Name}」-------------------");
+            sb.AppendLine($"//-------------------接口「{entity.Alias}」-------------------");
 
             foreach (var methodName in methodNames)
             {
-                sb.AppendLine($"{entity.Name}{methodName}: '/{i.Namespace}/{entity.Name}{methodName}',");
+                sb.AppendLine($"{entity.Alias}{methodName}: '/{i.Namespace}/{entity.Alias}{methodName}',");
             }
             sb.AppendLine();
 
@@ -70,7 +70,7 @@ public class WebVue
 
         foreach (var entity in i.FileName)
         {
-            sb.AppendLine($"//-------------------方法「{entity.Name}」-------------------");
+            sb.AppendLine($"//-------------------方法「{entity.Alias}」-------------------");
 
             foreach (var methodName in methodNames)
             {
@@ -85,9 +85,9 @@ public class WebVue
                     requestPostData = "unknown";
                 }
 
-                sb.AppendLine($"export function {entity.Name}{methodName}(data: any) {{");
+                sb.AppendLine($"export function {entity.Alias}{methodName}(data: any) {{");
                 sb.AppendLine($"   return request.post<{requestPostData}>({{");
-                sb.AppendLine($"     url: Api.{entity.Name}{methodName},");
+                sb.AppendLine($"     url: Api.{entity.Alias}{methodName},");
                 sb.AppendLine($"     data");
                 sb.AppendLine($"   }});");
                 sb.AppendLine($"}}");
@@ -111,16 +111,16 @@ public class WebVue
         {
             foreach (var entity in i.FileName)
             {
-                var filepathzi = filepath + $"/{i.Namespace}/{entity.Name}";
+                var filepathzi = filepath + $"/{i.Namespace}/{entity.Alias}";
                 FileHelper.CreatedFolder(filepathzi);
                 await CreatPagesIndex(filepathzi, entity, i);
 
-                filepathzi = filepath + $"/{i.Namespace}/{entity.Name}/components";
+                filepathzi = filepath + $"/{i.Namespace}/{entity.Alias}/components";
                 FileHelper.CreatedFolder(filepathzi);
                 await CreatPagesComponentsAdd(filepathzi, entity, i);
                 await CreatPagesComponentsImport(filepathzi, entity, i);
                 await CreatPagesComponentsExport(filepathzi, entity, i);
-
+                await CreatPagesComponentsSearchPanel(filepathzi, entity, i);
             }
             // var filepathzi = filepath + $"/{i.Namespace}/{i.FileName}";
             // FileHelper.CreatedFolder(filepathzi);
@@ -225,14 +225,20 @@ public class WebVue
         sb.AppendLine("          </t-space> ");
         sb.AppendLine("        </template>");
         sb.AppendLine("");
-        sb.AppendLine("        <template #State=\"slotProps\">");
-        sb.AppendLine("          <t-tag ");
-        sb.AppendLine("            :theme=\"slotProps.row.State ? 'success' : 'default'\" ");
-        sb.AppendLine("            variant=\"light\"");
-        sb.AppendLine("          >");
-        sb.AppendLine("            {{ slotProps.row.State ? t('components.isState.on') : t('components.isState.off') }}");
-        sb.AppendLine("          </t-tag>");
-        sb.AppendLine("        </template>");
+        foreach (var y in i.Attributes)
+        {
+            if (y.Name == "State")
+            {
+                sb.AppendLine("        <template #State=\"slotProps\">");
+                sb.AppendLine("          <t-tag ");
+                sb.AppendLine("            :theme=\"slotProps.row.State ? 'success' : 'default'\" ");
+                sb.AppendLine("            variant=\"light\"");
+                sb.AppendLine("          >");
+                sb.AppendLine("            {{ slotProps.row.State ? t('components.isState.on') : t('components.isState.off') }}");
+                sb.AppendLine("          </t-tag>");
+                sb.AppendLine("        </template>");
+            }
+        }
         sb.AppendLine("      </t-table>");
         sb.AppendLine(" ");
         sb.AppendLine("    </t-card>");
@@ -262,7 +268,7 @@ public class WebVue
         sb.AppendLine("<script setup>");
         sb.AppendLine("import { computed, onMounted, ref, defineAsyncComponent } from 'vue';");
         sb.AppendLine("import { t } from '@/locales';");
-        sb.AppendLine($"import {{ {i.Name}IndexInit }} from '@/api/{ns.Namespace}';");
+        sb.AppendLine($"import {{ {i.Alias}IndexInit }} from '@/api/{ns.Namespace}';");
         sb.AppendLine("import SearchPanel from './components/SearchPanel.vue';");
         sb.AppendLine("import OperationButtons from '@/pages/components/OperationButtons.vue';");
         sb.AppendLine("");
@@ -307,44 +313,44 @@ public class WebVue
         sb.AppendLine("const pagePermissions = ref([]);");
         sb.AppendLine("");
         sb.AppendLine("onMounted(() => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-onMounted');");
+        sb.AppendLine($"  console.log('{i.Alias}Index-onMounted');");
         sb.AppendLine("  initInfo();");
         sb.AppendLine("});");
         sb.AppendLine("");
         sb.AppendLine("const handleRowClick = (row, index) => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleRowClick', row, index);");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleRowClick', row, index);");
         sb.AppendLine("};");
         sb.AppendLine("const handleClickAddVisible = () => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleClickAddVisible');");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleClickAddVisible');");
         sb.AppendLine("  fromId.value = 0;");
         sb.AppendLine("  formDialogAddVisible.value = true;");
         sb.AppendLine("};");
         sb.AppendLine("const handleClickDetail = (row) => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleClickDetail',row);");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleClickDetail',row);");
         sb.AppendLine("  fromId.value = row.row.Id;");
         sb.AppendLine("  formDialogAddVisible.value = true;");
         sb.AppendLine("};");
         sb.AppendLine("const handleClickImportVisible = (row) => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleClickImportVisible',row);");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleClickImportVisible',row);");
         sb.AppendLine("  formDialogImportVisible.value = true;");
         sb.AppendLine("};");
         sb.AppendLine("const handleClickExportVisible = (row) => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleClickExportVisible',row); ");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleClickExportVisible',row); ");
         sb.AppendLine("  formDialogExportVisible.value = true; ");
         sb.AppendLine("};");
         sb.AppendLine("");
         sb.AppendLine("const initInfo = async () => {");
         sb.AppendLine("    dataLoading.value = true;");
-        sb.AppendLine($"    console.log('{i.Name}Index-initInfo');");
+        sb.AppendLine($"    console.log('{i.Alias}Index-initInfo');");
         sb.AppendLine("    ");
         sb.AppendLine("    // 根据搜索模式使用不同的搜索参数");
         sb.AppendLine("    const keyword = searchMode.value === 'simple' ");
         sb.AppendLine("      ? simpleSearchValue.value ");
         sb.AppendLine("      : searchParams.value.keyword;");
         sb.AppendLine("    ");
-        sb.AppendLine($"    console.log('{i.Name}Index-searchParams', searchMode.value === 'simple' ? {{ keyword }} : searchParams.value);");
+        sb.AppendLine($"    console.log('{i.Alias}Index-searchParams', searchMode.value === 'simple' ? {{ keyword }} : searchParams.value);");
         sb.AppendLine("    ");
-        sb.AppendLine($"    var res= await {i.Name}IndexInit({{");
+        sb.AppendLine($"    var res= await {i.Alias}IndexInit({{");
         sb.AppendLine("        Keyword: keyword,");
         sb.AppendLine("        //State: searchParams.value.state, // 复杂搜索时可启用");
         sb.AppendLine("        // Type: searchParams.value.type, // 第三个搜索条件示例");
@@ -352,11 +358,11 @@ public class WebVue
         sb.AppendLine("        PageSize: pagination.value?.pageSize || 0");
         sb.AppendLine("    });");
         sb.AppendLine("");
-        sb.AppendLine($"    console.log('{i.Name}Index-res', res);");
+        sb.AppendLine($"    console.log('{i.Alias}Index-res', res);");
         sb.AppendLine("");
-        sb.AppendLine($"    console.log('{i.Name}Index-columns', JSON.parse(res.columns) );");
+        sb.AppendLine($"    console.log('{i.Alias}Index-columns', JSON.parse(res.columns) );");
         sb.AppendLine("");
-        sb.AppendLine($"    console.log('{i.Name}Index-data', JSON.parse(res.data) );");
+        sb.AppendLine($"    console.log('{i.Alias}Index-data', JSON.parse(res.data) );");
         sb.AppendLine("");
         sb.AppendLine("    data.value=JSON.parse(res.data);");
         sb.AppendLine("    COLUMNS.value=JSON.parse(res.columns);");
@@ -377,7 +383,7 @@ public class WebVue
         sb.AppendLine("");
         sb.AppendLine("// 简单搜索处理");
         sb.AppendLine("const handleSimpleSearch = () => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleSimpleSearch', simpleSearchValue.value);");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleSimpleSearch', simpleSearchValue.value);");
         sb.AppendLine("  // 重置到第一页并搜索");
         sb.AppendLine("  if (pagination.value) {");
         sb.AppendLine("    pagination.value.current = 1;");
@@ -387,7 +393,7 @@ public class WebVue
         sb.AppendLine("");
         sb.AppendLine("// 搜索处理 - 接收搜索组件传递的搜索条件");
         sb.AppendLine("const handleSearch = (searchData) => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleSearch', searchData);");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleSearch', searchData);");
         sb.AppendLine("  // 更新搜索条件");
         sb.AppendLine("  searchParams.value = { ...searchData };");
         sb.AppendLine("  // 重置到第一页并搜索");
@@ -399,7 +405,7 @@ public class WebVue
         sb.AppendLine("");
         sb.AppendLine("// 重置搜索");
         sb.AppendLine("const handleSearchReset = () => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleSearchReset');");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleSearchReset');");
         sb.AppendLine("  searchParams.value = {");
         sb.AppendLine("    keyword: '',");
         sb.AppendLine("    state: '',");
@@ -413,7 +419,7 @@ public class WebVue
         sb.AppendLine("};");
         sb.AppendLine("");
         sb.AppendLine("const rehandlePageChange = (page) => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-rehandlePageChange', page);");
+        sb.AppendLine($"  console.log('{i.Alias}Index-rehandlePageChange', page);");
         sb.AppendLine("  pagination.value = {");
         sb.AppendLine("    current: page.current,");
         sb.AppendLine("    pageSize: page.pageSize,");
@@ -422,7 +428,7 @@ public class WebVue
         sb.AppendLine("};  ");
         sb.AppendLine("");
         sb.AppendLine("const handleFormSuccess = () => {");
-        sb.AppendLine($"  console.log('{i.Name}Index-handleFormSuccess - 重新加载表格数据');");
+        sb.AppendLine($"  console.log('{i.Alias}Index-handleFormSuccess - 重新加载表格数据');");
         sb.AppendLine("  initInfo(); // 重新加载表格数据");
         sb.AppendLine("};");
         sb.AppendLine("</script>");
@@ -444,204 +450,255 @@ public class WebVue
         string files = file + $"/DialogAdd.vue";
         var _sw = new StreamWriter(new FileStream(files, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read), Encoding.UTF8);
 
-sb.AppendLine("<template>");
-sb.AppendLine("  <t-dialog  v-model:visible=\"formVisible\" :header=\"t('components.create')\"");
-sb.AppendLine("  width=\"80%\" :footer=\"false\" :confirm-btn=\"null\" :cancel-btn=\"null\">");
-sb.AppendLine("    <template #body>");
-sb.AppendLine("      <t-loading :loading=\"initLoading || submitLoading\" :text=\"initLoading ? '加载中...' : '提交中...'\">");
-sb.AppendLine("      ");
-sb.AppendLine("      <t-form ref=\"formRefAdd\" :data=\"formData\" :rules=\"rules\" :label-width=\"100\" @submit=\"onSubmit\" :show-error-message=\"showErrorMessage\">");
+        sb.AppendLine("<template>");
+        sb.AppendLine("  <t-dialog  v-model:visible=\"formVisible\" :header=\"t('components.create')\"");
+        sb.AppendLine("  width=\"80%\" :footer=\"false\" :confirm-btn=\"null\" :cancel-btn=\"null\">");
+        sb.AppendLine("    <template #body>");
+        sb.AppendLine("      <t-loading :loading=\"initLoading || submitLoading\" :text=\"initLoading ? '加载中...' : '提交中...'\">");
+        sb.AppendLine("      ");
+        sb.AppendLine("      <t-form ref=\"formRefAdd\" :data=\"formData\" :rules=\"rules\" :label-width=\"100\" @submit=\"onSubmit\" :show-error-message=\"showErrorMessage\">");
         sb.AppendLine("        ");
         foreach (var y in i.Attributes)
         {
+            sb.AppendLine($"<t-form-item label=\"{y.Description}\" name=\"{y.Name}\">        ");
+
             if (y.Types0f == "Enum")
             {
-
-                sb.AppendLine($"<t-form-item label=\"{y.Description}\" name=\"{y.Name}\">        ");
                 sb.AppendLine("    <t-select");
                 sb.AppendLine($"      v-model=\"formData.{y.Name}\"");
                 sb.AppendLine($"      :options=\"resData.{y.Name}Select\"");
                 sb.AppendLine($"      placeholder=\"{y.Description}\"");
                 sb.AppendLine("      clearable");
                 sb.AppendLine("    ></t-select>");
-                sb.AppendLine("        </t-form-item>");
-                
+
             }
+            else if (y.Types0f == "Attributes" && y.AttributeName != "ThumbnailAttribute")
+            {
+                switch (y.AttributeName)
+                {
+                    case "EnumListStringAttribute":
+                        sb.AppendLine("    <t-select");
+                        sb.AppendLine($"      v-model=\"formData.{y.Name}\"");
+                        sb.AppendLine($"      :options=\"resData.{y.Name}Select\"");
+                        sb.AppendLine($"      placeholder=\"{y.Description}\"");
+                        sb.AppendLine("      clearable");
+                        sb.AppendLine("    ></t-select>");
+                        break;
+                    case "EnumListCheckAttribute":
+                        sb.AppendLine("    <t-select");
+                        sb.AppendLine($"      v-model=\"formData.{y.Name}\"");
+                        sb.AppendLine($"      :options=\"resData.{y.Name}Select\"");
+                        sb.AppendLine($"      placeholder=\"{y.Description}\"");
+                        sb.AppendLine("      clearable");
+                        sb.AppendLine("    ></t-select>");
+                        break;
+                    case "TableToAttribute":
+                        sb.AppendLine("    <t-select");
+                        sb.AppendLine($"      v-model=\"formData.{y.Name}\"");
+                        sb.AppendLine($"      :options=\"resData.{y.Name}Select\"");
+                        sb.AppendLine($"      placeholder=\"{y.Description}\"");
+                        sb.AppendLine("      clearable");
+                        sb.AppendLine("    ></t-select>");
+
+                        break;
+
+                }
+            }
+            else if (y.Name == "State")
+            {
+                sb.AppendLine("<t-switch v-model=\"formData.state\" size=\"large\">");
+                sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
+                sb.AppendLine("</t-switch>");
+            }
+            else
+            {
+                if (y.Types0f == "bool")
+                {
+
+                }
+                else if (y.Types0f == "DateTime")
+                { }
+                else if (y.Name == "Content")
+                {
+                }
+                else if (y.Name == "Remark" || y.Name == "Remarks" || y.Name == "Introduction")
+                {
+                    sb.AppendLine("<t-textarea");
+                    sb.AppendLine($"      v-model=\"formData.{y.Name}\"");
+                    sb.AppendLine("      placeholder=\"请输入备注，可以为空！\"");
+                    sb.AppendLine("      :maxlength=\"200\"");
+                    sb.AppendLine("    ></t-textarea>");
+                }
+                else if (y.Name == "Picture")
+                {
+                }
+                else
+                {
+                    sb.AppendLine($" <t-input v-model=\"formData.{y.Name}\" placeholder =\"{y.Description}\"/>");
+
+
+                }
+               }
+            sb.AppendLine("        </t-form-item>");
         }
-sb.AppendLine("        <t-form-item label=\"名称\" name=\"Title\">        ");
-sb.AppendLine("        <t-input v-model=\"formData.title\" placeholder =\"名称\"/>");
-        sb.AppendLine("        </t-form-item>");
+            sb.AppendLine("        <t-form-item style=\"float: right\">");
+            sb.AppendLine("          <t-input v-model=\"formData.id\" hidden />  ");
+            sb.AppendLine("          <t-button  variant=\"outline\" @click=\"onClickCloseBtn\" :disabled=\"initLoading || submitLoading\">取消</t-button>");
+            sb.AppendLine("          <t-button  v-if=\"hasPermissionEdit()\"  theme=\"primary\" type=\"submit\" :loading=\"submitLoading\" :disabled=\"initLoading\">确定</t-button>");
+            sb.AppendLine("        </t-form-item>");
+            sb.AppendLine("      </t-form>");
+            sb.AppendLine("      </t-loading>");
+            sb.AppendLine("    </template>");
+            sb.AppendLine("  </t-dialog>");
+            sb.AppendLine("</template>");
+            sb.AppendLine("<script setup>");
+            sb.AppendLine("import { ref, watch, onMounted } from 'vue';");
+            sb.AppendLine("import { MessagePlugin } from 'tdesign-vue-next';");
+            sb.AppendLine("");
+            sb.AppendLine("import { t } from '@/locales';");
+            sb.AppendLine($"import {{ {i.Alias}AddInit,{i.Alias}Add }} from '@/api/{ns.Namespace}';");
+            sb.AppendLine("import { commonRules } from '@/utils/validators';");
 
-sb.AppendLine("");
-sb.AppendLine("        <t-form-item label=\"状态\" name=\"state\">");
-sb.AppendLine("              <t-switch v-model=\"formData.state\" size=\"large\">");
-sb.AppendLine("                    <template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
-sb.AppendLine("              </t-switch>");
-        sb.AppendLine("        </t-form-item>");
-
-        sb.AppendLine("");
-
-sb.AppendLine("         <t-form-item label=\"备注\" name=\"Remarks\">");
-sb.AppendLine("          ");
-sb.AppendLine("         <t-textarea");
-sb.AppendLine("      v-model=\"formData.remarks\"");
-sb.AppendLine("      placeholder=\"请输入备注，可以为空！\"");
-sb.AppendLine("      :maxlength=\"200\"");
-sb.AppendLine("    ></t-textarea>");
-        sb.AppendLine("       </t-form-item>");
-
-
-sb.AppendLine("        <t-form-item style=\"float: right\">");
-sb.AppendLine("          <t-input v-model=\"formData.id\" hidden />  ");
-sb.AppendLine("          <t-button  variant=\"outline\" @click=\"onClickCloseBtn\" :disabled=\"initLoading || submitLoading\">取消</t-button>");
-sb.AppendLine("          <t-button  v-if=\"hasPermissionEdit()\"  theme=\"primary\" type=\"submit\" :loading=\"submitLoading\" :disabled=\"initLoading\">确定</t-button>");
-sb.AppendLine("        </t-form-item>");
-sb.AppendLine("      </t-form>");
-sb.AppendLine("      </t-loading>");
-sb.AppendLine("    </template>");
-sb.AppendLine("  </t-dialog>");
-sb.AppendLine("</template>");
-sb.AppendLine("<script setup>");
-sb.AppendLine("import { ref, watch, onMounted } from 'vue';");
-sb.AppendLine("import { MessagePlugin } from 'tdesign-vue-next';");
-sb.AppendLine("");
-sb.AppendLine("import { t } from '@/locales';");
-sb.AppendLine($"import {{ {i.Name}AddInit,{i.Name}Add }} from '@/api/{ns.Namespace}}';");
-sb.AppendLine("// 当前页面权限列表");
-sb.AppendLine("const pagePermissions = ref([]);");
-sb.AppendLine("");
-sb.AppendLine("const formRefAdd = ref(null);");
-sb.AppendLine("const formVisible = ref(false);");
-        sb.AppendLine("const formData = ref({});");
-sb.AppendLine("const resData = ref({});");
-sb.AppendLine("const showErrorMessage = ref(false);");
-sb.AppendLine("const submitLoading = ref(false);");
-sb.AppendLine("const initLoading = ref(false); // 初始化加载状态");
-sb.AppendLine("");
-sb.AppendLine("");
-        sb.AppendLine("const rules = ref({");
-
-        sb.AppendLine("  title: [{ required: true, message: '请输入名称', type: 'error' }],");
-
-sb.AppendLine("});");
-sb.AppendLine("");
-sb.AppendLine("const emit = defineEmits(['update:visible', 'success']);");
-sb.AppendLine("const { visible,Id } = defineProps({");
-sb.AppendLine("  visible: Boolean,");
-sb.AppendLine("  Id: Number,");
-sb.AppendLine("});");
-sb.AppendLine("");
-sb.AppendLine("// const props = defineProps({");
-sb.AppendLine("//     Id: integer,");
-sb.AppendLine("// })");
-sb.AppendLine("");
-sb.AppendLine("onMounted(() => {");
-sb.AppendLine($"  console.log('{i.Name}DialogAdd-onMounted');");
-sb.AppendLine("  // 不在这里执行 initInfo，等待弹窗打开时才执行");
-sb.AppendLine("});");
-sb.AppendLine("");
-sb.AppendLine("");
-sb.AppendLine(" const initInfo = async () => {");
-sb.AppendLine("      try {");
-sb.AppendLine("        initLoading.value = true; // 开启加载状态");
-sb.AppendLine($"        console.log('{i.Name}DialogAdd-initInfo');");
-sb.AppendLine($"        console.log('{i.Name}DialogAdd-Id:', Id);");
-sb.AppendLine($"        var res = await {i.Name}AddInit({{ id: Id }}); // 传递对象格式的参数");
-sb.AppendLine($"        console.log('{i.Name}DialogAdd-{i.Name}AddInit-res', res);");
-sb.AppendLine("        formData.value = res.post;");
-sb.AppendLine("        // 保存初始数据快照，用于重置表单");
-sb.AppendLine("        //initialFormData.value = JSON.parse(JSON.stringify(res.postModel));");
-sb.AppendLine("        pagePermissions.value = res.permissions || [];");
-sb.AppendLine("     ");
-sb.AppendLine("      } catch (error) {");
-sb.AppendLine("        // 错误已经在请求拦截器中统一处理");
-sb.AppendLine("      } finally {");
-sb.AppendLine("        initLoading.value = false; // 关闭加载状态");
-sb.AppendLine("      }");
-sb.AppendLine("};");
-sb.AppendLine("   ");
-sb.AppendLine("const onClickCloseBtn = () => {");
-sb.AppendLine("  formVisible.value = false;");
-sb.AppendLine("  // 关闭时清空表单数据");
-sb.AppendLine("  formData.value = {};");
-sb.AppendLine("  showErrorMessage.value = false;");
-sb.AppendLine("  if (formRefAdd.value) {");
-sb.AppendLine("    formRefAdd.value.clearValidate();");
-sb.AppendLine("  }");
-sb.AppendLine("};");
-sb.AppendLine("");
-sb.AppendLine("// 权限判断函数");
-sb.AppendLine("const hasPermission = (permissionCode) => {");
-sb.AppendLine("  return pagePermissions.value.includes(permissionCode);");
-sb.AppendLine("};");
-sb.AppendLine("");
-sb.AppendLine("const hasPermissionEdit = () => {");
-sb.AppendLine("  var permissionCode=3;");
-sb.AppendLine("  if(Id>0)  {permissionCode=4};");
-sb.AppendLine("  return pagePermissions.value.includes(permissionCode);");
-sb.AppendLine("};");
-sb.AppendLine("");
-sb.AppendLine("");
-sb.AppendLine("const onSubmit = async ({ validateResult, firstError }) => {");
-sb.AppendLine("  showErrorMessage.value = true; // 提交时才显示错误信息");
-sb.AppendLine("  if (firstError) {");
-sb.AppendLine("    console.log('Errors: ', validateResult);");
-sb.AppendLine("    MessagePlugin.warning(firstError);");
-sb.AppendLine("    return;");
-sb.AppendLine("  }");
-sb.AppendLine("  ");
-sb.AppendLine("  try {");
-sb.AppendLine("    submitLoading.value = true; // 开启加载状态");
-sb.AppendLine("    console.log('formData:', formData.value);");
-sb.AppendLine($"    var res = await {i.Name}Add(formData.value);");
-sb.AppendLine("");
-sb.AppendLine("    MessagePlugin.success('提交成功');");
-sb.AppendLine("    emit('success'); // 通知父组件刷新数据");
-sb.AppendLine("    onClickCloseBtn(); // 关闭对话框");
-sb.AppendLine("  } catch (error) {");
-sb.AppendLine("    console.error('提交失败:', error);");
-sb.AppendLine("    //MessagePlugin.error('提交失败，请重试');");
-sb.AppendLine("  } finally {");
-sb.AppendLine("    submitLoading.value = false; // 关闭加载状态");
-sb.AppendLine("  }");
-sb.AppendLine("");
-sb.AppendLine("};");
-sb.AppendLine("");
-sb.AppendLine("");
-sb.AppendLine("watch(");
-sb.AppendLine("  () => formVisible.value,");
-sb.AppendLine("  (val) => {");
-sb.AppendLine("    emit('update:visible', val);");
-sb.AppendLine("  },");
-sb.AppendLine(");");
-sb.AppendLine("");
-sb.AppendLine("watch(");
-sb.AppendLine("  () => visible,");
-sb.AppendLine("  (val) => {");
-sb.AppendLine("    formVisible.value = val;");
-sb.AppendLine("    if (val) {");
-sb.AppendLine("      // 打开对话框时重新加载数据");
-sb.AppendLine("      initInfo();");
-sb.AppendLine("    }");
-sb.AppendLine("  },");
-sb.AppendLine("  {{ immediate: true }} // 立即执行，解决懒加载组件初始化问题");
-sb.AppendLine(");");
-sb.AppendLine("</script>       ");
-        //sb.AppendLine("//-------------------组件逻辑-------------------");
-        await _sw.WriteAsync(sb.ToString());
-        _sw.Close();
+            sb.AppendLine("// 当前页面权限列表");
+            sb.AppendLine("const pagePermissions = ref([]);");
+            sb.AppendLine("");
+            sb.AppendLine("const formRefAdd = ref(null);");
+            sb.AppendLine("const formVisible = ref(false);");
+            sb.AppendLine("const formData = ref({});");
+            sb.AppendLine("const resData = ref({});");
+            sb.AppendLine("const showErrorMessage = ref(false);");
+            sb.AppendLine("const submitLoading = ref(false);");
+            sb.AppendLine("const initLoading = ref(false); // 初始化加载状态");
+            sb.AppendLine("");
+            sb.AppendLine("");
+            sb.AppendLine("const rules = ref({");
+            sb.AppendLine(" //roles: [{ required: true, message: '请选择最少一个角色', type: 'error' }],");
+            foreach (var y in i.Attributes)
+            {
+                sb.AppendLine($" //  {y.Name}: commonRules.required,"); 
+            }
+            
+            sb.AppendLine("});");
+            sb.AppendLine("");
+            sb.AppendLine("const emit = defineEmits(['update:visible', 'success']);");
+            sb.AppendLine("const { visible,Id } = defineProps({");
+            sb.AppendLine("  visible: Boolean,");
+            sb.AppendLine("  Id: Number,");
+            sb.AppendLine("});");
+            sb.AppendLine("");
+            sb.AppendLine("// const props = defineProps({");
+            sb.AppendLine("//     Id: integer,");
+            sb.AppendLine("// })");
+            sb.AppendLine("");
+            sb.AppendLine("onMounted(() => {");
+            sb.AppendLine($"  console.log('{i.Alias}DialogAdd-onMounted');");
+            sb.AppendLine("  // 不在这里执行 initInfo，等待弹窗打开时才执行");
+            sb.AppendLine("});");
+            sb.AppendLine("");
+            sb.AppendLine("");
+            sb.AppendLine(" const initInfo = async () => {");
+            sb.AppendLine("      try {");
+            sb.AppendLine("        initLoading.value = true; // 开启加载状态");
+            sb.AppendLine($"        console.log('{i.Alias}DialogAdd-initInfo');");
+            sb.AppendLine($"        console.log('{i.Alias}DialogAdd-Id:', Id);");
+            sb.AppendLine($"        var res = await {i.Alias}AddInit({{ id: Id }}); // 传递对象格式的参数");
+            sb.AppendLine($"        console.log('{i.Alias}DialogAdd-{i.Alias}AddInit-res', res);");
+            sb.AppendLine("        formData.value = res.postModel;");
+            sb.AppendLine("        resData.value = res;");
+            sb.AppendLine("        // 保存初始数据快照，用于重置表单");
+            sb.AppendLine("        //initialFormData.value = JSON.parse(JSON.stringify(res.postModel));");
+            sb.AppendLine("        pagePermissions.value = res.permissions || [];");
+            sb.AppendLine("     ");
+            sb.AppendLine("      } catch (error) {");
+            sb.AppendLine("        // 错误已经在请求拦截器中统一处理");
+            sb.AppendLine("      } finally {");
+            sb.AppendLine("        initLoading.value = false; // 关闭加载状态");
+            sb.AppendLine("      }");
+            sb.AppendLine("};");
+            sb.AppendLine("   ");
+            sb.AppendLine("const onClickCloseBtn = () => {");
+            sb.AppendLine("  formVisible.value = false;");
+            sb.AppendLine("  // 关闭时清空表单数据");
+            sb.AppendLine("  formData.value = {};");
+            sb.AppendLine("  showErrorMessage.value = false;");
+            sb.AppendLine("  if (formRefAdd.value) {");
+            sb.AppendLine("    formRefAdd.value.clearValidate();");
+            sb.AppendLine("  }");
+            sb.AppendLine("};");
+            sb.AppendLine("");
+            sb.AppendLine("// 权限判断函数");
+            sb.AppendLine("const hasPermission = (permissionCode) => {");
+            sb.AppendLine("  return pagePermissions.value.includes(permissionCode);");
+            sb.AppendLine("};");
+            sb.AppendLine("");
+            sb.AppendLine("const hasPermissionEdit = () => {");
+            sb.AppendLine("  var permissionCode=3;");
+            sb.AppendLine("  if(Id>0)  {permissionCode=4};");
+            sb.AppendLine("  return pagePermissions.value.includes(permissionCode);");
+            sb.AppendLine("};");
+            sb.AppendLine("");
+            sb.AppendLine("");
+            sb.AppendLine("const onSubmit = async ({ validateResult, firstError }) => {");
+            sb.AppendLine("  showErrorMessage.value = true; // 提交时才显示错误信息");
+            sb.AppendLine("  if (firstError) {");
+            sb.AppendLine("    console.log('Errors: ', validateResult);");
+            sb.AppendLine("    MessagePlugin.warning(firstError);");
+            sb.AppendLine("    return;");
+            sb.AppendLine("  }");
+            sb.AppendLine("  ");
+            sb.AppendLine("  try {");
+            sb.AppendLine("    submitLoading.value = true; // 开启加载状态");
+            sb.AppendLine("    console.log('formData:', formData.value);");
+            sb.AppendLine($"    var res = await {i.Alias}Add(formData.value);");
+            sb.AppendLine("");
+            sb.AppendLine("    MessagePlugin.success('提交成功');");
+            sb.AppendLine("    emit('success'); // 通知父组件刷新数据");
+            sb.AppendLine("    onClickCloseBtn(); // 关闭对话框");
+            sb.AppendLine("  } catch (error) {");
+            sb.AppendLine("    console.error('提交失败:', error);");
+            sb.AppendLine("    //MessagePlugin.error('提交失败，请重试');");
+            sb.AppendLine("  } finally {");
+            sb.AppendLine("    submitLoading.value = false; // 关闭加载状态");
+            sb.AppendLine("  }");
+            sb.AppendLine("");
+            sb.AppendLine("};");
+            sb.AppendLine("");
+            sb.AppendLine("");
+            sb.AppendLine("watch(");
+            sb.AppendLine("  () => formVisible.value,");
+            sb.AppendLine("  (val) => {");
+            sb.AppendLine("    emit('update:visible', val);");
+            sb.AppendLine("  },");
+            sb.AppendLine(");");
+            sb.AppendLine("");
+            sb.AppendLine("watch(");
+            sb.AppendLine("  () => visible,");
+            sb.AppendLine("  (val) => {");
+            sb.AppendLine("    formVisible.value = val;");
+            sb.AppendLine("    if (val) {");
+            sb.AppendLine("      // 打开对话框时重新加载数据");
+            sb.AppendLine("      initInfo();");
+            sb.AppendLine("    }");
+            sb.AppendLine("  },");
+            sb.AppendLine($"  {{ immediate: true }} // 立即执行，解决懒加载组件初始化问题");
+            sb.AppendLine(");");
+            sb.AppendLine("</script>       ");
+            //sb.AppendLine("//-------------------组件逻辑-------------------");
+            await _sw.WriteAsync(sb.ToString());
+            _sw.Close();
 
     }
-
-
     private async Task CreatPagesComponentsImport(string file, MyChyEntity i, MyChyEntityNamespace ns)
     {
         var sb = new StringBuilder();
 
-        string files = file + $"/components.vue";
+        string files = file + $"/DialogImport.vue";
         var _sw = new StreamWriter(new FileStream(files, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read), Encoding.UTF8);
 
-        sb.AppendLine("//-------------------组件逻辑-------------------");
+        sb.AppendLine("<template>");
+        sb.AppendLine("    <div>DialogImport</div>");
+        sb.AppendLine("</template>");
+
         await _sw.WriteAsync(sb.ToString());
         _sw.Close();
 
@@ -653,11 +710,116 @@ sb.AppendLine("</script>       ");
     {
         var sb = new StringBuilder();
 
-        string files = file + $"/components.vue";
+        string files = file + $"/DialogExport.vue";
         var _sw = new StreamWriter(new FileStream(files, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read), Encoding.UTF8);
 
-        sb.AppendLine("//-------------------组件逻辑-------------------");
+        sb.AppendLine("<template>");
+        sb.AppendLine("    <div>DialogExport</div>");
+        sb.AppendLine("</template>");
         await _sw.WriteAsync(sb.ToString());
+
+        _sw.Close();
+
+    }
+
+  private async Task CreatPagesComponentsSearchPanel(string file, MyChyEntity i, MyChyEntityNamespace ns)
+    {
+        var sb = new StringBuilder();
+
+        string files = file + $"/SearchPanel.vue";
+        var _sw = new StreamWriter(new FileStream(files, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read), Encoding.UTF8);
+
+       sb.AppendLine("<template>");
+sb.AppendLine("   <t-form ");
+sb.AppendLine("      ref=\"formRef\" ");
+sb.AppendLine("      :data=\"searchForm\" ");
+sb.AppendLine("      layout=\"inline\" ");
+sb.AppendLine("      label-align=\"left\"");
+sb.AppendLine("      class=\"search-form\"");
+sb.AppendLine("      @submit=\"onSubmit\" ");
+sb.AppendLine("      @reset=\"onReset\"");
+sb.AppendLine("    >");
+sb.AppendLine("      <t-form-item label=\"关键词\" name=\"keyword\">");
+sb.AppendLine("        <t-input ");
+sb.AppendLine("          v-model=\"searchForm.keyword\" ");
+sb.AppendLine("          :placeholder=\"t('components.placeholder')\" ");
+sb.AppendLine("          clearable ");
+sb.AppendLine("          @enter=\"onSubmit\"");
+sb.AppendLine("          style=\"width: 200px;\"");
+sb.AppendLine("        />");
+sb.AppendLine("      </t-form-item>");
+sb.AppendLine("      ");
+sb.AppendLine("      <t-form-item label=\"状态\" name=\"state\">");
+sb.AppendLine("        <t-select ");
+sb.AppendLine("          v-model=\"searchForm.state\" ");
+sb.AppendLine("          clearable ");
+sb.AppendLine("          placeholder=\"请选择状态\"");
+sb.AppendLine("          style=\"width: 120px;\"");
+sb.AppendLine("        >");
+sb.AppendLine("          <t-option value=\"\" label=\"全部\" />");
+sb.AppendLine("          <t-option :value=\"true\" label=\"启用\" />");
+sb.AppendLine("          <t-option :value=\"false\" label=\"禁用\" />");
+sb.AppendLine("        </t-select>");
+sb.AppendLine("      </t-form-item>");
+sb.AppendLine("      ");
+sb.AppendLine("      ");
+sb.AppendLine("      ");
+sb.AppendLine("      ");
+sb.AppendLine("      <t-form-item label-width=\"0\" class=\"button-group\">");
+sb.AppendLine("        <t-space :size=\"8\">");
+sb.AppendLine("          <t-button theme=\"primary\" type=\"submit\">");
+sb.AppendLine("            <template #icon><t-icon name=\"search\" /></template>");
+sb.AppendLine("            {{ t('components.search') }}");
+sb.AppendLine("          </t-button>");
+sb.AppendLine("          ");
+sb.AppendLine("          <t-button theme=\"default\" type=\"reset\" variant=\"outline\">");
+sb.AppendLine("            <template #icon><t-icon name=\"refresh\" /></template>");
+sb.AppendLine("            {{ t('components.reset') }}");
+sb.AppendLine("          </t-button>");
+sb.AppendLine("        </t-space>");
+sb.AppendLine("      </t-form-item>");
+sb.AppendLine("    </t-form>");
+sb.AppendLine(" ");
+sb.AppendLine("</template>");
+sb.AppendLine("");
+sb.AppendLine("<script setup>");
+sb.AppendLine("import { ref } from 'vue';");
+sb.AppendLine("import { t } from '@/locales';");
+sb.AppendLine("");
+sb.AppendLine("const formRef = ref(null);");
+sb.AppendLine("const searchForm = ref({");
+sb.AppendLine("  keyword: '',");
+sb.AppendLine("  state: '',");
+sb.AppendLine("  // type: '', // 第三个搜索条件示例");
+sb.AppendLine("});");
+sb.AppendLine("");
+sb.AppendLine("const emit = defineEmits(['search', 'reset']);");
+sb.AppendLine("");
+sb.AppendLine("// 提交搜索");
+sb.AppendLine("const onSubmit = () => {");
+sb.AppendLine("  console.log('SearchPanel-onSubmit', searchForm.value);");
+sb.AppendLine("  emit('search', { ...searchForm.value });");
+sb.AppendLine("};");
+sb.AppendLine("");
+sb.AppendLine("// 重置搜索");
+sb.AppendLine("const onReset = () => {");
+sb.AppendLine("  console.log('SearchPanel-onReset');");
+sb.AppendLine("  // 注意：此处代码将重置逻辑留给了父组件的 handleSearchReset，但仍需要清空本地表单。");
+sb.AppendLine("  searchForm.value = {");
+sb.AppendLine("    keyword: '',");
+sb.AppendLine("    state: '',");
+sb.AppendLine("    // type: '',");
+sb.AppendLine("  };");
+sb.AppendLine("  // 通知父组件执行重置和重新加载数据");
+sb.AppendLine("  emit('reset');");
+sb.AppendLine("};");
+sb.AppendLine("</script>");
+sb.AppendLine("");
+sb.AppendLine("<style scoped lang=\"less\">");
+sb.AppendLine("@import '@/style/table-page.less';");
+sb.AppendLine("</style>");
+        await _sw.WriteAsync(sb.ToString());
+
         _sw.Close();
 
     }

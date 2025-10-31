@@ -22,15 +22,20 @@ ss.Wait();
 var ss1 = RunViewModels(path, list);
 ss1.Wait();
 
-var ss2 = RunWeb(path, list);
-ss2.Wait();
+// var ss2 = RunWeb(path, list);
+// ss2.Wait();
+
+RunWebAdminVueCore(path, list).Wait();  
+
+
 
 var ss3 = RunService(path, list);
 ss3.Wait();
 
 
-var ss4 = RunWebCore(path, list);
-ss4.Wait();
+//var ss4 = RunWebCore(path, list);
+//ss4.Wait();
+RunWebVue(path, list).Wait();
 
 var ss5 = RunCoreDomains(path, list);
 ss5.Wait();
@@ -42,7 +47,7 @@ ss6.Wait();
 var sss = RunSuccess(path, list);
 sss.Wait();
 
-RunWebVue(path, list).Wait();
+
 
 
 
@@ -75,7 +80,10 @@ static async Task RunService(string path, IList<MyChyEntityNamespace> list)
     var cd = new Service();
     await cd.Write(path, list);
 
-    var cd1 = new ServiceWeb();
+    // var cd1 = new ServiceWeb();
+    // await cd1.Write(path, list);
+
+    var cd1 = new ServiceWebVue();
     await cd1.Write(path, list);
 
     var cd2 = new ServiceWebFront();
@@ -93,6 +101,14 @@ static async Task RunService(string path, IList<MyChyEntityNamespace> list)
 static async Task RunWebCore(string path, IList<MyChyEntityNamespace> list)
 {
     var cd = new WebCore();
+    await cd.Write(path, list);
+
+
+}
+
+static async Task RunWebAdminVueCore(string path, IList<MyChyEntityNamespace> list)
+{
+    var cd = new WebAdminVue();
     await cd.Write(path, list);
 
 
