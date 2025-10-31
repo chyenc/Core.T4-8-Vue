@@ -1,0 +1,4 @@
+dotnet.exe publish "D:\MyChy\Source\Repos\CoreWeb.Base6\MyChy.WebAdmin" --runtime linux-x64   --self-contained false  --output "d:\WebCore\Base.An.huiyuanjuice.cn" --configuration Release
+
+--不包含.NET 运行时
+

@@ -1,0 +1,7 @@
+FROM registry.cn-qingdao.aliyuncs.com/mychy/hy:core-v6.0
+LABEL author=MyChy
+RUN mkdir /webcore
+COPY web /webcore
+WORKDIR /webcore
+EXPOSE 80
+CMD [ "dotnet","MyChy.WebAdmin.dll" ]

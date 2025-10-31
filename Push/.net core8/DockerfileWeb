@@ -1,0 +1,8 @@
+FROM mychy/aspnetcore:8.0
+LABEL author=MyChy
+RUN mkdir /webcore
+COPY web /webcore
+WORKDIR /webcore
+EXPOSE 80
+CMD [ "dotnet","MyChy.WebFront.dll" ]
+

@@ -1,0 +1,11 @@
+################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/.vs
+/Lib/
+/MyChy.Core.T4/obj
+/MyChy.Core.T4/bin
+/MyChy.Core.T4.Console/bin
+/MyChy.Core.T4.Console/obj
+/T4

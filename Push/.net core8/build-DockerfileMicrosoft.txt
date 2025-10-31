@@ -1,0 +1,17 @@
+https://hub.docker.com/_/microsoft-dotnet-aspnet/?tab=description
+
+
+docker build -t mychy/aspnetcore:8.0 -f ./DockerfileMicrosoft . 
+docker build -t mychy/aspnetcore-font2:8.0 -f ./DockerfileMicrosoftFont . 
+
+fc-list :lang=zh 
+
+
+
+3c6f5d794762        mychy/hcmweb:50      "dotnet MyChy.WebF..."   3 weeks ago         Up Less than a second    0.0.0.0:8075->5000/tcp   HcmWeb50
+a1ff4fdd7aa2        mychy/hcmweb:49      "dotnet MyChy.WebF..."   3 weeks ago         Exited (0) 3 weeks ago                            HcmWeb49
+1bbf7547277e        mychy/hcmweb:48      "dotnet MyChy.WebF..."   3 weeks ago         Exited (0) 3 weeks ago                            HcmWeb48
+5cb977f4aad0        mychy/fadadaweb:4    "dotnet MyChy.WebF..."   4 weeks ago         Up Less than a second    0.0.0.0:8072->5000/tcp   FadadaWeb4
+2dbbe204132c        mychy/fadadaser:11   "dotnet MyChy.WebS..."   4 weeks ago         Up Less than a second    0.0.0.0:8073->5000/tcp   FadadaSer11
+efdb1b0f414c        mychy/fadadaan:27    "dotnet MyChy.WebA..."   4 weeks ago         Up Less than a second    0.0.0.0:8071->5000/tcp   FadadaAn27
+87cb14b4b0be        mychy/hcmser:4       "dotnet MyChy.WebS..."   6 weeks ago         Up Less than a second    0.0.0.0:8076->5000/tcp   HcmSer4

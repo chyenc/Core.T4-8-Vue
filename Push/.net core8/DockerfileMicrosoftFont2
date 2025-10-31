@@ -1,0 +1,4 @@
+FROM registry.huiyuanjuice.cn/aspnetcore:8.0
+COPY font/* /usr/share/fonts/truetype/
+RUN sed -i 's/http:\/\/deb.debian.org/http:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN apt update && apt install -y fontconfig && fc-cache -fv
