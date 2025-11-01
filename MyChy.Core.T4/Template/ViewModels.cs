@@ -51,8 +51,8 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine("using Microsoft.AspNetCore.Mvc.Rendering;");
                     sb.AppendLine("using MyChy.Frame.Core.Common.Model;");
                     sb.AppendLine("using MyChy.Plugin.Models.Cache;");
+                    sb.AppendLine($"using MyChy.Web.ViewModels.AdminVue;");
                     sb.AppendLine($"namespace MyChy.Web.ViewModels.{i.Namespace}");
-                    sb.AppendLine($"namespace MyChy.Web.ViewModels.AdminVue");
                     sb.AppendLine("{");
 
                     sb.AppendLine($"    public class {x.Name}IndexViewModel : TableVueReqly");
@@ -62,37 +62,36 @@ namespace MyChy.Core.T4.Template
 
                     sb.AppendLine($"public class {x.Name}PostViewModel : BaseViewModel");
                     sb.AppendLine("{");
-                    sb.Append($"public {x.Name}PostModel PostModel ");
+                    sb.Append($"public {x.Name}PostModel? PostModel ");
                     sb.AppendLine("{ get; set; }");
 
                     foreach (var y in x.Attributes)
                     {
+                        if (y.Types0f == "Enum")
+                        {
+
+                            sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
+                            sb.AppendLine("{ get; set; }");
+                        }
+
                         if (y.Types0f == "Attributes")
                         {
                             switch (y.AttributeName)
                             {
                                 case "EnumListStringAttribute":
-                                    sb.Append($"public ICollection<HtmlSelectOption>? {y.Name}Select ");
-                                    sb.AppendLine("{ get; set; }");
-
-                                    sb.Append($"public ICollection<string>? {y.Name}s ");
+                                    sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
                                     sb.AppendLine("{ get; set; }");
 
                                     break;
                                 case "EnumListCheckAttribute":
-                                    sb.Append($"public ICollection<HtmlSelectOption> {y.Name}Select ");
-                                    sb.AppendLine("{ get; set; }");
-
-                                    sb.Append($"public ICollection<string>? {y.Name}s ");
+                                    sb.Append($"public ICollection<HtmlSelectOptionInt> {y.Name}Select ");
                                     sb.AppendLine("{ get; set; }");
 
                                     break;
                                 case "TableToAttribute":
-                                    sb.Append($"public ICollection<HtmlSelectOption>? {y.Name}Select ");
+                                    sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
                                     sb.AppendLine("{ get; set; }");
 
-                                    sb.Append($"public ICollection<string>? {y.Name}s ");
-                                    sb.AppendLine("{ get; set; }");
                                     break;
 
                             }
@@ -137,13 +136,22 @@ namespace MyChy.Core.T4.Template
                                 sb.Append($"public {y.Types0f} {y.Name} ");
                                 sb.AppendLine("{ get; set; }");
                             }
-                            else if (y.Types0f == "Enum" || y.AttributeName == "EnumListStringAttribute" 
+                            else if (y.Types0f == "Enum" || y.AttributeName == "EnumListStringAttribute"
                                 || y.AttributeName == "TableToAttribute" || y.AttributeName == "TableToAttribute")
                             {
-                                sb.Append($"public int {y.Name} ");
+
+                                sb.Append($"public  IList<string>? {y.Name}s ");
                                 sb.AppendLine("{ get; set; }");
+
+                                sb.AppendLine("");
+                                sb.AppendLine("/// <summary>");
+                                sb.AppendLine($"/// {y.Description} 单选");
+                                sb.AppendLine("/// </summary>");
+                                sb.Append($"public int? {y.Name} ");
+                                sb.AppendLine("{ get; set; }");
+
+
                             }
- 
                             else
                             {
                                 sb.Append($"public string? {y.Name} ");

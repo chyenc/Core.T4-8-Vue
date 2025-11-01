@@ -99,7 +99,7 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine($"/// 显示分页{x.Description}");
                     sb.AppendLine("/// </summary>");
                     sb.AppendLine("/// <returns></returns>");
-                    sb.AppendLine($"Task<IPagedList<{x.Name}>> Show{x.Name}PageAsync({x.Name}SearchModel Search, int pageSize = 15);");
+                    sb.AppendLine($"Task<IPagedList<{x.Name}>> Show{x.Name}PageAsync({x.Name}SearchModel Search, int pageSize = 10);");
                     sb.AppendLine(" ");
 
                     if (!x.IsViewEntity)
@@ -588,6 +588,14 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine("if (thumbnailModel == null) { thumbnailModel = new ThumbnailModel() { Width = 200, Height = 400 }; }");
                         }
                         sb.AppendLine($"var result = new {x.Name}PostModel();");
+
+                        foreach (var y in x.Attributes)
+                        {
+                            if (y.Name == "State")
+                            {
+                                sb.AppendLine(" result.State = true;");
+                            }
+                        }
                         sb.AppendLine("if (Model?.Id > 0)");
                         sb.AppendLine("{");
                         sb.AppendLine($"result = _mapper.Map<{x.Name}, {x.Name}PostModel>(Model);");

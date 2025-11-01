@@ -141,7 +141,7 @@ public class WebAdminVue
             sb.AppendLine("        /// </summary>");
             sb.AppendLine("        /// <returns></returns>");
             sb.AppendLine($"        [AuthorityAction(\"{x.AuthorityCode}\", (int)CompetenceFeatures.List)]");
-            sb.AppendLine($"        public async Task<IActionResult> {x.Alias}Index([FromBody] {x.Name}SearchModel Search)");
+            sb.AppendLine($"        public async Task<IActionResult> {x.Alias}IndexInit([FromBody] {x.Name}SearchModel Search)");
             sb.AppendLine("        {");
             sb.AppendLine("");
             sb.AppendLine("            Search.IsAllData = false;");
@@ -152,10 +152,13 @@ public class WebAdminVue
             sb.AppendLine("             {");
             sb.AppendLine("                 Search.IsAllData = true;");
             sb.AppendLine("             }");
-            sb.AppendLine($"            var list = await {i.Namespace.ToLower()}Service.Show{x.Name}PageListBySearchAsync(Search);");
+            sb.AppendLine($"            var list = await {i.Namespace.ToLower()}Service.Show{x.Name}PageAsync(Search);");
             sb.AppendLine($"            var ConvertedList = {i.Namespace.ToLower()}Service.Conversion{x.Name}(list);");
             sb.AppendLine($"            var tabledata = await tableAdminVueService.ShowTableListAsync");
             sb.AppendLine($"            (username, \"{x.Name}\", ConvertedList);");
+
+
+
             sb.AppendLine("");
             sb.AppendLine($"            var result = new {x.Name}IndexViewModel");
             sb.AppendLine("            {");
@@ -176,7 +179,7 @@ public class WebAdminVue
 
             sb.AppendLine(" ");
             sb.AppendLine("        /// <summary>");
-            sb.AppendLine($"        /// {x.Description}添加初始化    ");
+            sb.AppendLine($"        /// {x.Description}添加 初始化");
             sb.AppendLine("        /// </summary>");
             sb.AppendLine("        /// <returns></returns>");
             sb.AppendLine($"        [AuthorityAction(\"{x.AuthorityCode}\", (int)CompetenceFeatures.View)]");
@@ -186,9 +189,33 @@ public class WebAdminVue
             sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(username);");
             sb.AppendLine($"            var result = new {x.Name}PostViewModel();");
             sb.AppendLine($"            var Features = competencesAdminVueService.ShowUserAuthorityByCode(username, \"{x.AuthorityCode}\");");
-            sb.AppendLine($"           var model = await {i.Namespace.ToLower()}Service.Show{x.Name}PageAsync(Search);");
+            sb.AppendLine($"           var model = await {i.Namespace.ToLower()}Service.Show{x.Name}CacheAsync(Search);");
             sb.AppendLine($"           result.PostModel = {i.Namespace.ToLower()}Service.Conversion{x.Name}(model);");
             sb.AppendLine("            result.Permissions = Features;");
+
+            foreach (var y in x.Attributes)
+            {
+                if (y.Types0f == "Enum")
+                {
+                    sb.AppendLine($"            result.{y.Name}Select = [.. (typeof({y.EnumName}).GetDescriptionList(0)).Select(x => new HtmlSelectOptionInt()");
+                    sb.AppendLine("            {");
+                    sb.AppendLine("                Label = x.Title,");
+                    sb.AppendLine("                Value = x.Id,");
+                    sb.AppendLine("            })];");
+                }
+            }
+
+            sb.AppendLine("            if (!(model?.Id > 0))");
+            sb.AppendLine("            {");
+            foreach (var y in x.Attributes)
+            {
+                if (y.Types0f == "Enum")
+                {
+                    sb.AppendLine($"                result.PostModel.{y.Name} = null;");
+                }
+            }
+            sb.AppendLine("            }");
+
             sb.AppendLine("");
             sb.AppendLine($"            var resultJson = new BaseVueReqly<{x.Name}PostViewModel>");
             sb.AppendLine("            {");
@@ -304,7 +331,7 @@ public class WebAdminVue
 
         sb.AppendLine("        }");
         sb.AppendLine("    }");
-                
+
         await _sw.WriteAsync(sb.ToString());
         _sw.Close();
 
