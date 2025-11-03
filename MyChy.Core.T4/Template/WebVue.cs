@@ -451,7 +451,7 @@ public class WebVue
         var _sw = new StreamWriter(new FileStream(files, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read), Encoding.UTF8);
 
         sb.AppendLine("<template>");
-        sb.AppendLine("  <t-dialog  v-model:visible=\"formVisible\" :header=\"t('components.create')\"");
+        sb.AppendLine("  <t-dialog  v-model:visible=\"formVisible\" :header=\"Id > 0 ? t('components.edit') : t('components.create')\" ");
         sb.AppendLine("  width=\"80%\" :footer=\"false\" :confirm-btn=\"null\" :cancel-btn=\"null\">");
         sb.AppendLine("    <template #body>");
         sb.AppendLine("      <t-loading :loading=\"initLoading || submitLoading\" :text=\"initLoading ? '加载中...' : '提交中...'\">");
@@ -514,7 +514,10 @@ public class WebVue
             {
                 if (y.Types0f == "bool")
                 {
-
+                    sb.AppendLine($"<t-switch v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" size=\"large\">");
+                    sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
+                    sb.AppendLine("</t-switch>");
+                  
                 }
                 else if (y.Types0f == "DateTime")
                 { }
