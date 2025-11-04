@@ -152,7 +152,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine("using MyChy.Service.Plugin.Caches;");
                 sb.AppendLine("using MyChy.Frame.Core.Common.Extensions;");
                 sb.AppendLine("using MyChy.Service.Database;");
-                sb.AppendLine("using MyChy.Service.WebAdmin;");
+                sb.AppendLine("using MyChy.Service.WebAdminVue;");
                 sb.AppendLine("using MyChy.Web.ViewModels.Front;");
                 sb.AppendLine("using MyChy.Web.ViewModels.Admin;");
 

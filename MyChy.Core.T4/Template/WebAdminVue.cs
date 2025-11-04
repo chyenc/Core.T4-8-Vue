@@ -27,9 +27,9 @@ public class WebAdminVue
 
         foreach (var i in list)
         {
-            var filePath = file + "/" + i.Namespace;
-            FileHelper.CreatedFolder(filePath);
-            await CreatControllers(filePath, i);
+            //var filePath = file + "/" + i.Namespace;
+            //FileHelper.CreatedFolder(filePath);
+            await CreatControllers(file, i);
         }
 
 

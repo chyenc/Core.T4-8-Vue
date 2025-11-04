@@ -47,7 +47,7 @@ public class WebVue
     {
         var sb = new StringBuilder();
 
-        string files = file + $"/{i.Namespace}.ts";
+        string files = file + $"/{FirstCharToLowerCase(i.Namespace)}.ts";
         var _sw = new StreamWriter(new FileStream(files, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read), Encoding.UTF8);
 
         var methodNames = new List<string>() { "IndexInit", "AddInit", "Add", "ImportInit", "Import", "Export" };
@@ -268,7 +268,7 @@ public class WebVue
         sb.AppendLine("<script setup>");
         sb.AppendLine("import { computed, onMounted, ref, defineAsyncComponent } from 'vue';");
         sb.AppendLine("import { t } from '@/locales';");
-        sb.AppendLine($"import {{ {i.Alias}IndexInit }} from '@/api/{ns.Namespace}';");
+        sb.AppendLine($"import {{ {i.Alias}IndexInit }} from '@/api/{FirstCharToLowerCase(ns.Namespace)}';");
         sb.AppendLine("import SearchPanel from './components/SearchPanel.vue';");
         sb.AppendLine("import OperationButtons from '@/pages/components/OperationButtons.vue';");
         sb.AppendLine("");
@@ -559,7 +559,7 @@ public class WebVue
         sb.AppendLine("import { MessagePlugin } from 'tdesign-vue-next';");
         sb.AppendLine("");
         sb.AppendLine("import { t } from '@/locales';");
-        sb.AppendLine($"import {{ {i.Alias}AddInit,{i.Alias}Add }} from '@/api/{ns.Namespace}';");
+        sb.AppendLine($"import {{ {i.Alias}AddInit,{i.Alias}Add }} from '@/api/{FirstCharToLowerCase(ns.Namespace)}';");
         sb.AppendLine("import { commonRules } from '@/utils/validators';");
 
         sb.AppendLine("// 当前页面权限列表");
