@@ -234,6 +234,7 @@ namespace MyChy.Core.T4.Template
             {
                 return "string?";
             }
+            
             if (Types0f == "long")
             {
                 return "long?"; 

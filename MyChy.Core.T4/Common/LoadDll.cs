@@ -299,6 +299,10 @@ namespace MyChy.Core.T4.Common
                                     attributes.AttributeTwo = GetModelValue("ThumHigth", x);
                                     entity.IsThumbnail = true;
                                 }
+                                else if (attributes.AttributeName == "TableColumnAttribute")
+                                {
+                                    attributes.Types0f = ConvertTypes0f(item.PropertyType.ToString());
+                                }
 
                             }
                         }
@@ -391,6 +395,9 @@ namespace MyChy.Core.T4.Common
                     break;
                 case "System.Nullable`1[System.Int32]":
                     result = "int?";
+                    break;
+                case "System.Nullable`1[System.Boolean]":
+                    result = "bool?";
                     break;
                 default:
                     var xx = val.IndexOf("MyChy.Core.Domains.");

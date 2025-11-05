@@ -14,8 +14,6 @@ namespace MyChy.Core.T4.Template
        // private const string IMappings = "/Mappings";
         private const string Implementation = "/Implementation";
 
-
-
         /// <summary>
         /// 输出模板
         /// </summary>
@@ -76,8 +74,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine("using MyChy.Frame.Core.Common.Model;");
                 sb.AppendLine($"using MyChy.Web.ViewModels.{i.Namespace};");
                 sb.AppendLine($"using MyChy.Frame.Core.Services;");
-                sb.AppendLine("using MyChy.Web.ViewModels.Front;");
-                sb.AppendLine("using MyChy.Web.ViewModels.Admin;");
+                sb.AppendLine("using MyChy.Web.ViewModels.AdminVue;");
 
                 sb.AppendLine("namespace MyChy.Service.WebAdminVue");
                 sb.AppendLine("{");
@@ -153,8 +150,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine("using MyChy.Frame.Core.Common.Extensions;");
                 sb.AppendLine("using MyChy.Service.Database;");
                 sb.AppendLine("using MyChy.Service.WebAdminVue;");
-                sb.AppendLine("using MyChy.Web.ViewModels.Front;");
-                sb.AppendLine("using MyChy.Web.ViewModels.Admin;");
+                sb.AppendLine("using MyChy.Web.ViewModels.AdminVue;");
 
                 sb.AppendLine("");
 
