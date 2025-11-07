@@ -52,6 +52,14 @@ public class WebVue
 
         var methodNames = new List<string>() { "IndexInit", "AddInit", "Add", "ImportInit", "Import", "Export" };
 
+        sb.AppendLine("import { request } from '@/utils/request';");
+        sb.AppendLine("import type { TableResult } from '@/api/model/baseModel';");
+        sb.AppendLine("import type { UserInfo } from './model/userModel';"); // 假设导入了特定类型
+        sb.AppendLine();
+
+        // --- 定义 API 对象 ---
+        sb.AppendLine("const Api = {");
+
         sb.AppendLine("//-------------------接口地址-------------------");
         foreach (var entity in i.FileName)
         {
@@ -64,6 +72,8 @@ public class WebVue
             sb.AppendLine();
 
         }
+        sb.AppendLine("};");
+        
         sb.AppendLine();
 
         sb.AppendLine("//-------------------分割线-------------------");
@@ -267,11 +277,13 @@ public class WebVue
         sb.AppendLine("");
         sb.AppendLine("<script setup>");
         sb.AppendLine("import { computed, onMounted, ref, defineAsyncComponent } from 'vue';");
+        sb.AppendLine("import { useRouter } from 'vue-router';");
         sb.AppendLine("import { t } from '@/locales';");
         sb.AppendLine($"import {{ {i.Alias}IndexInit }} from '@/api/{FirstCharToLowerCase(ns.Namespace)}';");
         sb.AppendLine("import SearchPanel from './components/SearchPanel.vue';");
         sb.AppendLine("import OperationButtons from '@/pages/components/OperationButtons.vue';");
         sb.AppendLine("");
+        sb.AppendLine("const router = useRouter();");
         sb.AppendLine("// 懒加载 Dialog 组件");
         sb.AppendLine("const DialogAdd = defineAsyncComponent(() => import('./components/DialogAdd.vue'));");
         sb.AppendLine("const DialogImport = defineAsyncComponent(() => import('./components/DialogImport.vue'));");

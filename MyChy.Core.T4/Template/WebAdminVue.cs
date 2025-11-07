@@ -144,10 +144,10 @@ public class WebAdminVue
             sb.AppendLine($"        public async Task<IActionResult> {x.Alias}IndexInit([FromBody] {x.Name}SearchModel Search)");
             sb.AppendLine("        {");
             sb.AppendLine("");
-            sb.AppendLine("            Search.IsAllData = false;");
-            sb.AppendLine("            var username = GetUserCode(_logger);");
-            sb.AppendLine($"            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(username);");
-            sb.AppendLine($"            var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(username, \"{x.AuthorityCode}\");");
+            sb.AppendLine("             Search.IsAllData = false;");
+            sb.AppendLine("             Search.BaseLoginName = GetUserCode(_logger);");
+            sb.AppendLine($"            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(Search.BaseLoginName);");
+            sb.AppendLine($"            var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(Search.BaseLoginName, \"{x.AuthorityCode}\");");
             sb.AppendLine("             if (Features.Contains((int)CompetenceFeatures.AllData))");
             sb.AppendLine("             {");
             sb.AppendLine("                 Search.IsAllData = true;");
@@ -155,7 +155,7 @@ public class WebAdminVue
             sb.AppendLine($"            var list = await {i.Namespace.ToLower()}Service.Show{x.Name}PageAsync(Search);");
             sb.AppendLine($"            var ConvertedList = {i.Namespace.ToLower()}Service.Conversion{x.Name}(list);");
             sb.AppendLine($"            var tabledata = await tableAdminVueService.ShowTableListAsync");
-            sb.AppendLine($"            (username, \"{x.Name}\", ConvertedList);");
+            sb.AppendLine($"            (Search.BaseLoginName, \"{x.Name}\", ConvertedList);");
 
 
 
@@ -185,10 +185,10 @@ public class WebAdminVue
             sb.AppendLine($"        [AuthorityAction(\"{x.AuthorityCode}\", (int)CompetenceFeatures.View)]");
             sb.AppendLine($"        public async Task<IActionResult> {x.Alias}AddInit([FromBody] {x.Name}SearchModel Search)");
             sb.AppendLine("        {");
-            sb.AppendLine("            var username = GetUserCode(_logger);");
-            sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(username);");
+            sb.AppendLine("                    Search.BaseLoginName = GetUserCode(_logger);");
+            sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(Search.BaseLoginName);");
             sb.AppendLine($"            var result = new {x.Name}PostViewModel();");
-            sb.AppendLine($"            var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(username, \"{x.AuthorityCode}\");");
+            sb.AppendLine($"            var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(Search.BaseLoginName, \"{x.AuthorityCode}\");");
             sb.AppendLine($"           var model = await {i.Namespace.ToLower()}Service.Show{x.Name}CacheAsync(Search);");
             sb.AppendLine($"           result.PostModel = {i.Namespace.ToLower()}Service.Conversion{x.Name}(model);");
             sb.AppendLine("            result.Permissions = Features;");
@@ -236,9 +236,9 @@ public class WebAdminVue
             sb.AppendLine($"        public async Task<IActionResult> {x.Alias}Add([FromBody] {x.Name}PostModel postModel)");
             sb.AppendLine("        {");
             sb.AppendLine("");
-            sb.AppendLine("            var username = GetUserCode(_logger);");
-            sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(username);");
-            sb.AppendLine($"            //var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(username, \"{x.AuthorityCode}\");");
+            sb.AppendLine("            postModel.BaseLoginName = GetUserCode(_logger);");
+            sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(postModel.BaseLoginName);");
+            sb.AppendLine($"            //var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(postModel.BaseLoginName, \"{x.AuthorityCode}\");");
             sb.AppendLine("");
             sb.AppendLine($"            var result = await {i.Namespace.ToLower()}AdminVueService.Save{x.Name}PostAsync(postModel);");
             sb.AppendLine("            var resultJson = new BaseVueReqly");
@@ -264,9 +264,9 @@ public class WebAdminVue
             sb.AppendLine($"        [AuthorityAction(\"{x.AuthorityCode}\", (int)CompetenceFeatures.Import)]");
             sb.AppendLine($"        public async Task<IActionResult>  {x.Alias}ImportInit([FromBody] ImportSearchModel Search)");
             sb.AppendLine("        {");
-            sb.AppendLine("            var username = GetUserCode(_logger);");
-            sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(username);");
-            sb.AppendLine($"            var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(username, \"{x.AuthorityCode}\");");
+            sb.AppendLine("                    Search.BaseLoginName = GetUserCode(_logger);");
+            sb.AppendLine("            //var userinfo = competencesAdminVueService.ShowAdminUserInfo(Search.BaseLoginName);");
+            sb.AppendLine($"            var Features = await competencesAdminVueService.ShowUserAuthorityByCodeAsync(Search.BaseLoginName, \"{x.AuthorityCode}\");");
             sb.AppendLine("");
             sb.AppendLine("            var result = new ImportViewModel()");
             sb.AppendLine("            {");
@@ -290,9 +290,10 @@ public class WebAdminVue
             sb.AppendLine("        /// <returns></returns>");
             sb.AppendLine("        [HttpPost]");
             sb.AppendLine($"        [AuthorityAction(\"{x.AuthorityCode}\", (int)CompetenceFeatures.Import)]");
-            sb.AppendLine($"        public async Task<IActionResult> {x.Alias}Import([FromBody] ImportPostModel PostModel)");
+            sb.AppendLine($"        public async Task<IActionResult> {x.Alias}Import([FromBody] ImportPostModel postModel)");
             sb.AppendLine("        {");
-            sb.AppendLine($"           var result = await {i.Namespace.ToLower()}AdminVueService.Import{x.Name}PostAsync(PostModel);");
+            sb.AppendLine($"            postModel.BaseLoginName = GetUserCode(_logger);");
+            sb.AppendLine($"           var result = await {i.Namespace.ToLower()}AdminVueService.Import{x.Name}PostAsync(postModel);");
             sb.AppendLine("            var resultJson = new BaseVueReqly");
             sb.AppendLine("            {");
             sb.AppendLine("                Success = true,");
@@ -315,6 +316,7 @@ public class WebAdminVue
             sb.AppendLine($"        [AuthorityAction(\"{x.AuthorityCode}\", (int)CompetenceFeatures.Export)]");
             sb.AppendLine($"        public async Task<IActionResult> {x.Alias}Export([FromBody] {x.Name}SearchModel Search)");
             sb.AppendLine("        {");
+            sb.AppendLine("                    Search.BaseLoginName = GetUserCode(_logger);");
             sb.AppendLine($"            var result = await {i.Namespace.ToLower()}AdminVueService.Export{x.Name}PostAsync(Search);");
             sb.AppendLine("            if (!result.Success)");
             sb.AppendLine("            {");

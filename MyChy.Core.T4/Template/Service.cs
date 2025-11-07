@@ -147,7 +147,7 @@ namespace MyChy.Core.T4.Template
                     sb.Append($"IPagedList<{x.Name}PostModel> Conversion{x.Name}(IPagedList<{x.Name}> list");
                     if (x.IsThumbnail)
                     {
-                        sb.Append($", ThumbnailModel thumbnailModel=null");
+                        sb.Append($", ThumbnailModel? thumbnailModel=null");
                     }
                     sb.AppendLine($");");
 
@@ -163,7 +163,7 @@ namespace MyChy.Core.T4.Template
                         sb.Append($"IList<{x.Name}PostModel> Conversion{x.Name}(IList<{x.Name}> list");
                         if (x.IsThumbnail)
                         {
-                            sb.Append($",ThumbnailModel thumbnailModel=null");
+                            sb.Append($",ThumbnailModel? thumbnailModel=null");
                         }
                         sb.AppendLine($");");
 
@@ -176,7 +176,7 @@ namespace MyChy.Core.T4.Template
                         sb.Append($"{x.Name}PostModel Conversion{x.Name}({x.Name} Model");
                         if (x.IsThumbnail)
                         {
-                            sb.Append($", ThumbnailModel thumbnailModel=null");
+                            sb.Append($", ThumbnailModel? thumbnailModel=null");
                         }
                         sb.AppendLine($");");
                         sb.AppendLine(" ");
@@ -325,7 +325,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine($"private readonly ILogger _logger;");
                 sb.AppendLine($"private readonly IMapper mapper;");
                 sb.AppendLine($"private readonly ILogsService logsService;");
-
+                 sb.AppendLine($"private readonly ICommonService commonService;");
                 foreach (var y in newservicelist)
                 {
                     sb.AppendLine($"private readonly I{y}Service {y.ToLower()}Service;");
@@ -344,9 +344,9 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine($",I{y}Service _{y.ToLower()}Service");
                 }
 
-
                 sb.AppendLine(", ILogsService _logsService");
                 sb.AppendLine(", ILoggerFactory loggerFactory");
+                sb.AppendLine(", ICommonService _commonService");
                 if (isPicture)
                 {
                     sb.AppendLine(", IConfigServerice _configServerice");
@@ -363,6 +363,7 @@ namespace MyChy.Core.T4.Template
                 }
                 sb.AppendLine($"_logger = loggerFactory.CreateLogger<{i.Namespace}Service>();");
                 sb.AppendLine($"logsService = _logsService;");
+                sb.AppendLine($"commonService = _commonService;");
                 if (isPicture)
                 {
                     sb.AppendLine("configServerice = _configServerice;");
@@ -472,6 +473,7 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine("model.State = true;");
                         }
                         sb.AppendLine("}");
+                        sb.AppendLine($"model ??= new {x.Name}();");
                         sb.AppendLine("return model;");
                         sb.AppendLine("}");
 
@@ -494,6 +496,7 @@ namespace MyChy.Core.T4.Template
                         sb.AppendLine("generalCacheServer.Set(key, result, Second);");
                         sb.AppendLine("}");
                         sb.AppendLine("}");
+                        sb.AppendLine($"result ??= new {x.Name}();");
                         sb.AppendLine("return result;");
                         sb.AppendLine("}");
 
@@ -510,7 +513,7 @@ namespace MyChy.Core.T4.Template
                     sb.Append($"public IPagedList<{x.Name}PostModel> Conversion{x.Name}(IPagedList<{x.Name}> list");
                     if (x.IsThumbnail)
                     {
-                        sb.Append(",ThumbnailModel thumbnailModel=null");
+                        sb.Append(",ThumbnailModel? thumbnailModel=null");
                     }
                     sb.AppendLine(")");
 
@@ -537,7 +540,7 @@ namespace MyChy.Core.T4.Template
                     sb.Append($"public IList<{x.Name}PostModel> Conversion{x.Name}(IList<{x.Name}> list");
                     if (x.IsThumbnail)
                     {
-                        sb.Append(",ThumbnailModel thumbnailModel=null");
+                        sb.Append(",ThumbnailModel? thumbnailModel=null");
                     }
                     sb.AppendLine(")");
 
@@ -565,7 +568,7 @@ namespace MyChy.Core.T4.Template
 
                     sb.AppendLine("            }");
 
-                    sb.AppendLine($"return result.ToList();");
+                    sb.AppendLine($"return [.. result];");
                     sb.AppendLine("}");
 
                     if (!x.IsViewEntity)
@@ -578,9 +581,10 @@ namespace MyChy.Core.T4.Template
                         sb.Append($"public {x.Name}PostModel Conversion{x.Name}({x.Name} Model");
                         if (x.IsThumbnail)
                         {
-                            sb.Append(",ThumbnailModel thumbnailModel=null");
+                            sb.Append(",ThumbnailModel? thumbnailModel=null");
                         }
-                        sb.Append(")");
+                        sb.AppendLine(")");
+
                         sb.AppendLine("{");
 
                         if (x.IsThumbnail)
@@ -598,7 +602,7 @@ namespace MyChy.Core.T4.Template
                         }
                         sb.AppendLine("if (Model?.Id > 0)");
                         sb.AppendLine("{");
-                        sb.AppendLine($"result = _mapper.Map<{x.Name}, {x.Name}PostModel>(Model);");
+                        sb.AppendLine($"result = mapper.Map<{x.Name}, {x.Name}PostModel>(Model);");
                         if (isPicture)
                         {
                             sb.AppendLine("if (!string.IsNullOrEmpty(result.Picture))");
@@ -663,6 +667,7 @@ namespace MyChy.Core.T4.Template
                         }
 
                         sb.AppendLine("}");
+                        
                         sb.AppendLine("return result;");
 
                         sb.AppendLine("}");
@@ -684,7 +689,7 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine($"//var counts = _{i.Namespace}Work.{x.Name}R.QueryNoTracking().Where(x => x.Title == PostModel.Title && x.Id != PostModel.Id).Count();");
                             sb.AppendLine("//if (counts > 0) { result.Msg = \"名称相同，请修改名称\"; return result; }");
 
-                            sb.AppendLine("var userinfo =  AdminIdentityServer.AccountUserid();");
+                            sb.AppendLine("var userinfo = await commonService.ShowAdminUserInfoAsync(PostModel.BaseLoginName);");
                             sb.AppendLine("if (userinfo?.UserId > 0) DefUserName = $\"{userinfo.UserNick}-{userinfo.UserName}\";");
 
                             sb.AppendLine($"var model = new {x.Name}();");
@@ -805,7 +810,7 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine($"public async Task<ResultBaseModel> Delete{x.Name}PostAsync({x.Name}SearchModel Search)");
                             sb.AppendLine("{");
                             sb.AppendLine("var result = new ResultBaseModel();");
-                            sb.AppendLine("var userinfo = AdminIdentityServer.AccountUserid();");
+                            sb.AppendLine($"var userinfo = await commonService.ShowAdminUserInfoAsync({x.Name}SearchModel.BaseLoginName);");
 
                             sb.AppendLine($"var Model = await _{i.Namespace}Work.{x.Name}R.GetByIdAsync(Search.Id);");
 
