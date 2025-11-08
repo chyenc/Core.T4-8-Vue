@@ -625,8 +625,8 @@ namespace MyChy.Core.T4.Template
                                 sb.AppendLine($"result.{y.Name}Show =  Model.{y.Name}.ToDescription();;");
                                 //sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
                             }
-                            else if (y.Types0f == "Attributes")
-                            {
+                            else if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(y.AttributeName))
+                                {
                                 switch (y.AttributeName)
                                 {
                                     case "EnumListStringAttribute":

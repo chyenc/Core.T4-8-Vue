@@ -37,7 +37,7 @@ namespace MyChy.Core.T4.Template
                 {
                     foreach (var y in x.Attributes)
                     {
-                        if (y.Types0f == "Attributes")
+                        if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(y.AttributeName))
                         {
                             switch (y.AttributeName)
                             {
