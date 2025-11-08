@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MyChy.Frame.Core" Version="8.1.1" />
-    <PackageReference Include="MyChy.Frame.Core.Common" Version="8.1.7" />
-    <PackageReference Include="MyChy.Frame.Core.EFCore" Version="8.1.1" />
+    <PackageReference Include="MyChy.Frame.Core.Common" Version="8.1.13" />
+    <PackageReference Include="MyChy.Frame.Core.EFCore" Version="8.1.2" />
   </ItemGroup>
 </Project>
