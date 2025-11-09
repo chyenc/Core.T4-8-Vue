@@ -74,29 +74,29 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine("{ get; set; }");
                         }
 
-                        if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(y.AttributeName))
+                        if (y.Types0f == "Attributes" || y.List.Count > 0)
                         {
-                            switch (y.AttributeName)
+                            foreach (var z in y.List)
                             {
-                                case "EnumListStringAttribute":
-                                    sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
-                                    sb.AppendLine("{ get; set; }");
+                                switch (z.Name)
+                                {
+                                    case "EnumListStringAttribute":
+                                        sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
+                                        sb.AppendLine("{ get; set; }");
 
-                                    break;
-                                case "EnumListCheckAttribute":
-                                    sb.Append($"public ICollection<HtmlSelectOptionInt> {y.Name}Select ");
-                                    sb.AppendLine("{ get; set; }");
+                                        break;
+                                    case "EnumListCheckAttribute":
+                                        sb.Append($"public ICollection<HtmlSelectOptionInt> {y.Name}Select ");
+                                        sb.AppendLine("{ get; set; }");
 
-                                    break;
-                                case "TableToAttribute":
-                                    sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
-                                    sb.AppendLine("{ get; set; }");
+                                        break;
+                                    case "TableToAttribute":
+                                        sb.Append($"public ICollection<HtmlSelectOptionInt>? {y.Name}Select ");
+                                        sb.AppendLine("{ get; set; }");
 
-                                    break;
-
+                                        break;
+                                }
                             }
-
-
                         }
                     }
 
@@ -113,11 +113,11 @@ namespace MyChy.Core.T4.Template
                         sb.AppendLine($"/// {y.Description}");
                         sb.AppendLine("/// </summary>");
                         sb.AppendLine($"[Description(\"{y.Description}\")]");
-                        if (y.Types0f == "Enum" || y.AttributeName == "EnumListStringAttribute" 
+                        if (y.Types0f == "Enum" || y.AttributesName.Contains("EnumListStringAttribute")
                             || y.Name == "Picture" || y.Types0f == "DateTime"
-                            || y.AttributeName == "TableToAttribute")
+                            || y.AttributesName.Contains("TableToAttribute"))
                         {
-                            if (y.Name == "Picture" )
+                            if (y.Name == "Picture")
                             {
                                 sb.Append($"public string? {y.Name} ");
                                 sb.AppendLine("{ get; set; }");
@@ -136,8 +136,8 @@ namespace MyChy.Core.T4.Template
                                 sb.Append($"public {y.Types0f} {y.Name} ");
                                 sb.AppendLine("{ get; set; }");
                             }
-                            else if (y.Types0f == "Enum" || y.AttributeName == "EnumListStringAttribute"
-                                || y.AttributeName == "TableToAttribute" || y.AttributeName == "TableToAttribute")
+                            else if (y.Types0f == "Enum" || y.AttributesName.Contains("EnumListStringAttribute")
+                                || y.AttributesName.Contains("TableToAttribute"))
                             {
 
                                 sb.Append($"public  IList<string>? {y.Name}s ");
@@ -167,7 +167,7 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine("{ get; set; }");
 
                         }
-                        else if (y.AttributeName == "EnumListCheckAttribute")
+                        else if (y.AttributesName.Contains("EnumListCheckAttribute"))
                         {
                             sb.Append($"public string? {y.Name} ");
                             sb.AppendLine("{ get; set; }");
@@ -215,7 +215,7 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine("{");
                     sb.AppendLine("}");
 
-                    
+
                     sb.AppendLine("}");
 
                     await _sw.WriteAsync(sb.ToString());
@@ -234,10 +234,10 @@ namespace MyChy.Core.T4.Template
             {
                 return "string?";
             }
-            
+
             if (Types0f == "long")
             {
-                return "long?"; 
+                return "long?";
             }
 
             return Types0f;

@@ -70,7 +70,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine($"using MyChy.Web.ViewModels.{i.Namespace};");
                 sb.AppendLine("using MyChy.Web.ViewModels.Admin;");
                 sb.AppendLine(" using MyChy.Frame.Core.Common.Model;");
-               
+
 
                 foreach (var y in newservicelist)
                 {
@@ -153,7 +153,7 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine($"if (Features.Contains((int)CompetenceFeatures.AllData))");
                     sb.AppendLine("{");
                     sb.AppendLine("    Search.IsAllData = true;");
-                   sb.AppendLine(" }");
+                    sb.AppendLine(" }");
                     sb.AppendLine("else");
                     sb.AppendLine("{");
                     sb.AppendLine("    Search.IsAllData = false;");
@@ -200,45 +200,48 @@ namespace MyChy.Core.T4.Template
                         sb.AppendLine(" ");
                         foreach (var y in x.Attributes)
                         {
-                            if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(y.AttributeName))
+                            if (y.Types0f == "Attributes" || y.List.Count > 0)
                             {
-                                switch (y.AttributeName)
+                                foreach (var z in y.List)
                                 {
-                                    case "EnumListStringAttribute":
-                                        sb.Append($"result.{y.Name}Select=");
-                                        sb.AppendLine(" await expandsService.ShowEnumListVualeSelectListCacheAsync(");
-                                        sb.Append($"new ViewModels.Expands.EnumListVualeSearchModel()");
-                                        sb.Append("{ EnumListCoding =");
-                                        sb.Append($"\"{y.AttributeCode}\", State = true");
-                                        sb.AppendLine(" }); ");
-                                        sb.AppendLine(" ");
-                                        break;
-                                    case "EnumListCheckAttribute":
-                                        sb.Append($"result.{y.Name}Select=");
-                                        sb.AppendLine(" await expandsService.ShowEnumListCheckSelectListCacheAsync(");
-                                        sb.Append($"new ViewModels.Expands.EnumListCheckSearchModel()");
-                                        sb.Append("{ EnumListCoding =");
-                                        sb.Append($"\"{y.AttributeCode}\", TableId= result.Post.Id, State = true");
-                                        sb.AppendLine(" }); ");
-                                        sb.AppendLine(" ");
-                                        break;
-                                    case "TableToAttribute":
-                                        if (y.AttributeTwo == "BaseArea"|| string.IsNullOrEmpty(y.AttributeTwo))
-                                        {
-                                            sb.Append($"var {y.AttributeOne}List = await {i.Namespace.ToLower()}Service.Show{y.AttributeOne}ListCacheAsync(new {y.AttributeOne}SearchModel ");
-                                        }
-                                        else
-                                        {
-                                            sb.Append($"var {y.AttributeOne}List = await {y.AttributeTwo.ToLower()}Service.Show{y.AttributeOne}ListCacheAsync(new {y.AttributeOne}SearchModel ");
-                                        }
-                                        sb.AppendLine("{ State = true });");
+                                    switch (z.Name)
+                                    {
+                                        case "EnumListStringAttribute":
+                                            sb.Append($"result.{y.Name}Select=");
+                                            sb.AppendLine(" await expandsService.ShowEnumListVualeSelectListCacheAsync(");
+                                            sb.Append($"new ViewModels.Expands.EnumListVualeSearchModel()");
+                                            sb.Append("{ EnumListCoding =");
+                                            sb.Append($"\"{z.Code}\", State = true");
+                                            sb.AppendLine(" }); ");
+                                            sb.AppendLine(" ");
+                                            break;
+                                        case "EnumListCheckAttribute":
+                                            sb.Append($"result.{y.Name}Select=");
+                                            sb.AppendLine(" await expandsService.ShowEnumListCheckSelectListCacheAsync(");
+                                            sb.Append($"new ViewModels.Expands.EnumListCheckSearchModel()");
+                                            sb.Append("{ EnumListCoding =");
+                                            sb.Append($"\"{z.Code}\", TableId= result.Post.Id, State = true");
+                                            sb.AppendLine(" }); ");
+                                            sb.AppendLine(" ");
+                                            break;
+                                        case "TableToAttribute":
+                                            if (z.Two == "BaseArea" || string.IsNullOrEmpty(z.Two))
+                                            {
+                                                sb.Append($"var {z.One}List = await {i.Namespace.ToLower()}Service.Show{z.One}ListCacheAsync(new {z.One}SearchModel ");
+                                            }
+                                            else
+                                            {
+                                                sb.Append($"var {z.One}List = await {z.Two.ToLower()}Service.Show{z.One}ListCacheAsync(new {z.One}SearchModel ");
+                                            }
+                                            sb.AppendLine("{ State = true });");
 
-                                        sb.Append($"result.{y.Name}Select = {y.AttributeOne}List.Select(x => new SelectListItem()");
-                                        sb.AppendLine("{");
-                                        sb.Append($" Text = x.{y.AttributeThree},");
-                                        sb.Append($" Value = x.Id.ToString()");
-                                        sb.AppendLine(" }).ToList();");
-                                        break;
+                                            sb.Append($"result.{y.Name}Select = {z.One}List.Select(x => new SelectListItem()");
+                                            sb.AppendLine("{");
+                                            sb.Append($" Text = x.{z.Three},");
+                                            sb.Append($" Value = x.Id.ToString()");
+                                            sb.AppendLine(" }).ToList();");
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -261,14 +264,17 @@ namespace MyChy.Core.T4.Template
                         {
                             if (y.Types0f == "Attributes")
                             {
-                                switch (y.AttributeName)
+                                foreach (var z in y.List)
                                 {
-                                    case "EnumListCheckAttribute":
-                                        sb.Append($"var {y.Name}String = await expandsService.ShowEnumListVualeByCodingCacheAsync(");
-                                        sb.AppendLine($" \"{y.AttributeCode}\", PostModel.{y.Name}List);");
-                                        sb.AppendLine($"if (!string.IsNullOrEmpty({y.Name}String) ) PostModel.{y.Name} = {y.Name}String;");
-                                        sb.AppendLine(" ");
-                                        break;
+                                    switch (z.Name)
+                                    {
+                                        case "EnumListCheckAttribute":
+                                            sb.Append($"var {y.Name}String = await expandsService.ShowEnumListVualeByCodingCacheAsync(");
+                                            sb.AppendLine($" \"{z.Code}\", PostModel.{y.Name}List);");
+                                            sb.AppendLine($"if (!string.IsNullOrEmpty({y.Name}String) ) PostModel.{y.Name} = {y.Name}String;");
+                                            sb.AppendLine(" ");
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -279,13 +285,16 @@ namespace MyChy.Core.T4.Template
                         {
                             if (y.Types0f == "Attributes")
                             {
-                                switch (y.AttributeName)
+                                foreach (var z in y.List)
                                 {
-                                    case "EnumListCheckAttribute":
-                                        sb.Append($"await expandsService.SaveEnumListCheckByEnumListCodingPostAsync");
-                                        sb.AppendLine($"(\"{y.AttributeCode}\", model.Id,PostModel.{y.Name}List);");
-                                        sb.AppendLine(" ");
-                                        break;
+                                    switch (z.Name)
+                                    {
+                                        case "EnumListCheckAttribute":
+                                            sb.Append($"await expandsService.SaveEnumListCheckByEnumListCodingPostAsync");
+                                            sb.AppendLine($"(\"{z.Code}\", model.Id,PostModel.{y.Name}List);");
+                                            sb.AppendLine(" ");
+                                            break;
+                                    }
                                 }
                             }
                         }

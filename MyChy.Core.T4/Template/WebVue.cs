@@ -1,6 +1,8 @@
-using System.Text;
+using Microsoft.AspNetCore.Routing;
 using MyChy.Core.T4.Common;
 using MyChy.Frame.Core.Common.Helper;
+using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MyChy.Core.T4.Template;
 
@@ -73,7 +75,7 @@ public class WebVue
 
         }
         sb.AppendLine("};");
-        
+
         sb.AppendLine();
 
         sb.AppendLine("//-------------------分割线-------------------");
@@ -183,7 +185,7 @@ public class WebVue
         sb.AppendLine("      </t-row>");
         sb.AppendLine("");
         sb.AppendLine("      ");
-        sb.AppendLine("      <template v-else>");
+        sb.AppendLine("      <!-- <template v-else>");
         sb.AppendLine("        ");
         sb.AppendLine("        <t-row class=\"operation-row\">");
         sb.AppendLine("          <operation-buttons ");
@@ -198,7 +200,7 @@ public class WebVue
         sb.AppendLine("        <t-row class=\"search-row\">");
         sb.AppendLine("          <search-panel @search=\"handleSearch\" @reset=\"handleSearchReset\" />");
         sb.AppendLine("        </t-row>");
-        sb.AppendLine("      </template>");
+        sb.AppendLine("      </template> -->");
         sb.AppendLine("");
         sb.AppendLine("");
         sb.AppendLine("    ");
@@ -277,13 +279,16 @@ public class WebVue
         sb.AppendLine("");
         sb.AppendLine("<script setup>");
         sb.AppendLine("import { computed, onMounted, ref, defineAsyncComponent } from 'vue';");
-        sb.AppendLine("import { useRouter } from 'vue-router';");
+        sb.AppendLine("import { useRouter,useRoute } from 'vue-router';");
+
         sb.AppendLine("import { t } from '@/locales';");
         sb.AppendLine($"import {{ {i.Alias}IndexInit }} from '@/api/{FirstCharToLowerCase(ns.Namespace)}';");
-        sb.AppendLine("import SearchPanel from './components/SearchPanel.vue';");
+        sb.AppendLine("//import SearchPanel from './components/SearchPanel.vue';");
         sb.AppendLine("import OperationButtons from '@/pages/components/OperationButtons.vue';");
         sb.AppendLine("");
-        sb.AppendLine("const router = useRouter();");
+        sb.AppendLine("//const router = useRouter();");
+        sb.AppendLine("//const route = useRoute();");
+        sb.AppendLine("//const queryId = ref (0); ");
         sb.AppendLine("// 懒加载 Dialog 组件");
         sb.AppendLine("const DialogAdd = defineAsyncComponent(() => import('./components/DialogAdd.vue'));");
         sb.AppendLine("const DialogImport = defineAsyncComponent(() => import('./components/DialogImport.vue'));");
@@ -326,6 +331,7 @@ public class WebVue
         sb.AppendLine("");
         sb.AppendLine("onMounted(() => {");
         sb.AppendLine($"  console.log('{i.Alias}Index-onMounted');");
+        sb.AppendLine($"  // queryId.value = parseInt(route.query.id) || 0; ");
         sb.AppendLine("  initInfo();");
         sb.AppendLine("});");
         sb.AppendLine("");
@@ -364,6 +370,7 @@ public class WebVue
         sb.AppendLine("    ");
         sb.AppendLine($"    var res= await {i.Alias}IndexInit({{");
         sb.AppendLine("        Keyword: keyword,");
+        sb.AppendLine("        //Id:queryId.value,");
         sb.AppendLine("        //State: searchParams.value.state, // 复杂搜索时可启用");
         sb.AppendLine("        // Type: searchParams.value.type, // 第三个搜索条件示例");
         sb.AppendLine("        Pageid: pagination.value?.current || 1,");
@@ -484,36 +491,46 @@ public class WebVue
                 sb.AppendLine("    ></t-select>");
 
             }
-            else if (y.Types0f == "Attributes" && y.AttributeName != "ThumbnailAttribute")
+            else if (y.Types0f == "Attributes")
             {
-                switch (y.AttributeName)
+                var issb = false;
+                foreach (var z in y.List)
                 {
-                    case "EnumListStringAttribute":
-                        sb.AppendLine("    <t-select");
-                        sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
-                        sb.AppendLine($"      :options=\"resData.{FirstCharToLowerCase(y.Name)}Select\"");
-                        sb.AppendLine($"      placeholder=\"{y.Description}\"");
-                        sb.AppendLine("      clearable");
-                        sb.AppendLine("    ></t-select>");
-                        break;
-                    case "EnumListCheckAttribute":
-                        sb.AppendLine("    <t-select");
-                        sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
-                        sb.AppendLine($"      :options=\"resData.{FirstCharToLowerCase(y.Name)}Select\"");
-                        sb.AppendLine($"      placeholder=\"{y.Description}\"");
-                        sb.AppendLine("      clearable");
-                        sb.AppendLine("    ></t-select>");
-                        break;
-                    case "TableToAttribute":
-                        sb.AppendLine("    <t-select");
-                        sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
-                        sb.AppendLine($"      :options=\"resData.{FirstCharToLowerCase(y.Name)}Select\"");
-                        sb.AppendLine($"      placeholder=\"{y.Description}\"");
-                        sb.AppendLine("      clearable");
-                        sb.AppendLine("    ></t-select>");
+                    switch (z.Name)
+                    {
+                        case "EnumListStringAttribute":
+                            sb.AppendLine("    <t-select");
+                            sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
+                            sb.AppendLine($"      :options=\"resData.{FirstCharToLowerCase(y.Name)}Select\"");
+                            sb.AppendLine($"      placeholder=\"{y.Description}\"");
+                            sb.AppendLine("      clearable");
+                            sb.AppendLine("    ></t-select>");
+                            issb = true;
+                            break;
+                        case "EnumListCheckAttribute":
+                            sb.AppendLine("    <t-select");
+                            sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
+                            sb.AppendLine($"      :options=\"resData.{FirstCharToLowerCase(y.Name)}Select\"");
+                            sb.AppendLine($"      placeholder=\"{y.Description}\"");
+                            sb.AppendLine("      clearable");
+                            sb.AppendLine("    ></t-select>");
+                            issb = true;
+                            break;
+                        case "TableToAttribute":
+                            sb.AppendLine("    <t-select");
+                            sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
+                            sb.AppendLine($"      :options=\"resData.{FirstCharToLowerCase(y.Name)}Select\"");
+                            sb.AppendLine($"      placeholder=\"{y.Description}\"");
+                            sb.AppendLine("      clearable");
+                            sb.AppendLine("    ></t-select>");
+                            issb = true;
+                            break;
+                    }
+                }
 
-                        break;
-
+                if (!issb)
+                {
+                    sb.AppendLine($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" placeholder =\"{y.Description}\"/>");
                 }
             }
             else if (y.Name == "State")
@@ -529,7 +546,7 @@ public class WebVue
                     sb.AppendLine($"<t-switch v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" size=\"large\">");
                     sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
                     sb.AppendLine("</t-switch>");
-                  
+
                 }
                 else if (y.Types0f == "DateTime")
                 { }
@@ -546,6 +563,10 @@ public class WebVue
                 }
                 else if (y.Name == "Picture")
                 {
+                }
+                else if (y.Name == "Code")
+                {
+                    sb.AppendLine($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" :disabled=\"formData.id > 0\"  placeholder =\"{y.Description}\"/>");
                 }
                 else
                 {
@@ -601,10 +622,10 @@ public class WebVue
         sb.AppendLine("  Id: Number,");
         sb.AppendLine("});");
         sb.AppendLine("");
-        sb.AppendLine("// const props = defineProps({");
-        sb.AppendLine("//     Id: integer,");
-        sb.AppendLine("// })");
-        sb.AppendLine("");
+        //sb.AppendLine("// const props = defineProps({");
+        //sb.AppendLine("//     Id: integer,");
+        //sb.AppendLine("// })");
+        //sb.AppendLine("");
         sb.AppendLine("onMounted(() => {");
         sb.AppendLine($"  console.log('{i.Alias}DialogAdd-onMounted');");
         sb.AppendLine("  // 不在这里执行 initInfo，等待弹窗打开时才执行");
@@ -620,8 +641,8 @@ public class WebVue
         sb.AppendLine($"        console.log('{i.Alias}DialogAdd-{i.Alias}AddInit-res', res);");
         sb.AppendLine("        formData.value = res.postModel;");
         sb.AppendLine("        resData.value = res;");
-        sb.AppendLine("        // 保存初始数据快照，用于重置表单");
-        sb.AppendLine("        //initialFormData.value = JSON.parse(JSON.stringify(res.postModel));");
+       // sb.AppendLine("        // 保存初始数据快照，用于重置表单");
+       // sb.AppendLine("        //initialFormData.value = JSON.parse(JSON.stringify(res.postModel));");
         sb.AppendLine("        pagePermissions.value = res.permissions || [];");
         sb.AppendLine("     ");
         sb.AppendLine("      } catch (error) {");

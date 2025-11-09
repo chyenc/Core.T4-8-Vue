@@ -37,35 +37,37 @@ namespace MyChy.Core.T4.Template
                 {
                     foreach (var y in x.Attributes)
                     {
-                        if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(y.AttributeName))
+                        foreach (var z in y.List)
                         {
-                            switch (y.AttributeName)
+                            if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(z.Name))
                             {
-                                case "EnumListStringAttribute":
-                                    sb.AppendLine($" enumList = new EnumList()");
-                                    sb.AppendLine("{");
-                                    sb.AppendLine($"Title = \"{x.Description}-{y.Description}\",");
-                                    sb.AppendLine($"State = true,");
-                                    sb.AppendLine($"Coding = \"{y.AttributeCode}\",");
-                                    sb.AppendLine($"Rrecommend = 0,");
-                                    sb.AppendLine("}; ");
-                                    sb.AppendLine($"db.Set<EnumList>().Add(enumList); ");
-                                    sb.AppendLine(" ");
-                                    break;
-                                case "EnumListCheckAttribute":
-                                    sb.AppendLine($" enumList = new EnumList()");
-                                    sb.AppendLine("{");
-                                    sb.AppendLine($"Title = \"{x.Description}-{y.Description}\",");
-                                    sb.AppendLine($"State = true,");
-                                    sb.AppendLine($"Coding = \"{y.AttributeCode}\",");
-                                    sb.AppendLine($"Rrecommend = 0,");
-                                    sb.AppendLine("}; ");
-                                    sb.AppendLine($"db.Set<EnumList>().Add(enumList); ");
-                                    sb.AppendLine(" ");
-                                    break;
+                                switch (z.Name)
+                                {
+                                    case "EnumListStringAttribute":
+                                        sb.AppendLine($" enumList = new EnumList()");
+                                        sb.AppendLine("{");
+                                        sb.AppendLine($"Title = \"{x.Description}-{y.Description}\",");
+                                        sb.AppendLine($"State = true,");
+                                        sb.AppendLine($"Coding = \"{z.Name}\",");
+                                        sb.AppendLine($"Rrecommend = 0,");
+                                        sb.AppendLine("}; ");
+                                        sb.AppendLine($"db.Set<EnumList>().Add(enumList); ");
+                                        sb.AppendLine(" ");
+                                        break;
+                                    case "EnumListCheckAttribute":
+                                        sb.AppendLine($" enumList = new EnumList()");
+                                        sb.AppendLine("{");
+                                        sb.AppendLine($"Title = \"{x.Description}-{y.Description}\",");
+                                        sb.AppendLine($"State = true,");
+                                        sb.AppendLine($"Coding = \"{z.Name}\",");
+                                        sb.AppendLine($"Rrecommend = 0,");
+                                        sb.AppendLine("}; ");
+                                        sb.AppendLine($"db.Set<EnumList>().Add(enumList); ");
+                                        sb.AppendLine(" ");
+                                        break;
+                                }
                             }
                         }
-
 
                     }
 

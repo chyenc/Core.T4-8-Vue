@@ -75,26 +75,34 @@ namespace MyChy.Core.T4.Common
 
     public class MyChyEntityAttributes
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string Types0f { get; set; }
+        public string? Types0f { get; set; }
 
-        public string EnumName { get; set; }
+        public string? EnumName { get; set; }
 
-        public string AttributeName { get; set; }
+        public IList<EntityAttributesInfo> List { get; set; }
 
-        public string AttributeCode { get; set; }
+        public IList<string> AttributesName { get; set; }
 
-        public string AttributeNamespace { get; set; }
+    }
 
-        public string AttributeOne { get; set; }
+    public class EntityAttributesInfo
+    {
+        public string? Name { get; set; }
 
-        public string AttributeTwo { get; set; }
+        public string? Code { get; set; }
+
+        public string? Namespace { get; set; }
+
+        public string? One { get; set; }
+
+        public string? Two { get; set; }
 
 
-        public string AttributeThree { get; set; }
+        public string? Three { get; set; }
     }
 
 

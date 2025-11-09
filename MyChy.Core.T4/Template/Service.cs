@@ -301,7 +301,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine("using MyChy.Frame.Core.Common.Extensions;");
                 sb.AppendLine("using MyChy.Service.Plugin.Config;");
                 sb.AppendLine("using MyChy.Web.ViewModels.Logs;");
-                
+
                 foreach (var y in newservicelist)
                 {
                     sb.AppendLine($"using MyChy.Web.ViewModels.{y};");
@@ -325,7 +325,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine($"private readonly ILogger _logger;");
                 sb.AppendLine($"private readonly IMapper mapper;");
                 sb.AppendLine($"private readonly ILogsService logsService;");
-                 sb.AppendLine($"private readonly ICommonService commonService;");
+                sb.AppendLine($"private readonly ICommonService commonService;");
                 foreach (var y in newservicelist)
                 {
                     sb.AppendLine($"private readonly I{y}Service {y.ToLower()}Service;");
@@ -625,38 +625,42 @@ namespace MyChy.Core.T4.Template
                                 sb.AppendLine($"result.{y.Name}Show =  Model.{y.Name}.ToDescription();;");
                                 //sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
                             }
-                            else if (y.Types0f == "Attributes" || !string.IsNullOrEmpty(y.AttributeName))
+                            else if (y.Types0f == "Attributes" || y.List.Count > 0)
+                            {
+
+                                foreach (var z in y.List)
                                 {
-                                switch (y.AttributeName)
-                                {
-                                    case "EnumListStringAttribute":
-                                        sb.Append($"result.{y.Name}Show = ");
-                                        sb.Append($"expandsService.ShowEnumListVualeByCodingCacheAsync");
-                                        sb.AppendLine($"(\"{y.AttributeCode}\",Model.{y.Name}).Result;");
-                                        break;
-                                    case "TableToAttribute":
-                                        sb.AppendLine($"if (Model.{y.Name}>0)");
-                                        sb.AppendLine("{");
-                                        if (y.AttributeTwo == "BaseArea" || string.IsNullOrEmpty(y.AttributeTwo))
-                                        {
-                                            sb.Append($"var info = Show{y.AttributeOne}CacheAsync (new {y.AttributeOne}SearchModel() ");
-                                            sb.Append("{ Id =");
-                                            sb.Append($" Model.{y.Name}");
-                                            sb.AppendLine("}).Result;");
-                                        }
-                                        else
-                                        {
-                                            sb.Append($"var info = {y.AttributeTwo.ToLower()}Service.Show{y.AttributeOne}CacheAsync (new {y.AttributeOne}SearchModel() ");
-                                            sb.Append("{ Id =");
-                                            sb.Append($" Model.{y.Name}");
-                                            sb.AppendLine("}).Result;");
+                                    switch (z.Name)
+                                    {
+                                        case "EnumListStringAttribute":
+                                            sb.Append($"result.{y.Name}Show = ");
+                                            sb.Append($"expandsService.ShowEnumListVualeByCodingCacheAsync");
+                                            sb.AppendLine($"(\"{z.Code}\",Model.{y.Name}).Result;");
+                                            break;
+                                        case "TableToAttribute":
+                                            sb.AppendLine($"if (Model.{y.Name}>0)");
+                                            sb.AppendLine("{");
+                                            if (z.Two == "BaseArea" || string.IsNullOrEmpty(z.Two))
+                                            {
+                                                sb.Append($"var info = Show{z.One}CacheAsync (new {z.One}SearchModel() ");
+                                                sb.Append("{ Id =");
+                                                sb.Append($" Model.{y.Name}");
+                                                sb.AppendLine("}).Result;");
+                                            }
+                                            else
+                                            {
+                                                sb.Append($"var info = {z.Two.ToLower()}Service.Show{z.One}CacheAsync (new {z.One}SearchModel() ");
+                                                sb.Append("{ Id =");
+                                                sb.Append($" Model.{y.Name}");
+                                                sb.AppendLine("}).Result;");
 
-                                        }
-                                        sb.Append($"if (info?.Id > 0) result.{y.Name}Show = info.{y.AttributeThree}; ");
+                                            }
+                                            sb.Append($"if (info?.Id > 0) result.{y.Name}Show = info.{z.Three}; ");
 
-                                        sb.AppendLine("}");
+                                            sb.AppendLine("}");
 
-                                        break;
+                                            break;
+                                    }
                                 }
                             }
                             else if (y.Types0f == "DateTime")
@@ -667,7 +671,7 @@ namespace MyChy.Core.T4.Template
                         }
 
                         sb.AppendLine("}");
-                        
+
                         sb.AppendLine("return result;");
 
                         sb.AppendLine("}");
@@ -706,6 +710,13 @@ namespace MyChy.Core.T4.Template
                                 if (y.Types0f == "Enum")
                                 {
                                     sb.AppendLine($"model.{y.Name} = ({y.EnumName})PostModel.{y.Name};");
+                                }
+                                else if (y.AttributesName.Contains("EnumListStringAttribute"))
+                                {
+                                    sb.AppendLine($"if (PostModel?.{y.Name} > 0)");
+                                    sb.AppendLine("{");
+                                    sb.AppendLine($"    model.{y.Name} = PostModel.{y.Name}.Value;");
+                                    sb.AppendLine("}");
                                 }
                                 else
                                 {

@@ -220,7 +220,7 @@ namespace MyChy.Core.T4.Common
                         var leg = fullname.IndexOf(key);
                         if (leg == 0)
                         {
-                            var AttributeName = fullname.Substring(key.Length+1);
+                            var AttributeName = fullname.Substring(key.Length + 1);
                             if (AttributeName == T4ViewGenerate)
                             {
                                 entity.IsViewEntity = true;
@@ -256,52 +256,62 @@ namespace MyChy.Core.T4.Common
                             Description = item.Description,
                             Name = item.Name,
                             Types0f = ConvertTypes0f(item.PropertyType.ToString()),
+                            List = new List<EntityAttributesInfo>(),
+                            AttributesName = new List<string>(),
+
                         };
                         foreach (var x in item.Attributes)
                         {
                             var leg = x.ToString().IndexOf("MyChy.Core.Domains.Attributes");
                             if (leg == 0)
                             {
+                                var info = new EntityAttributesInfo();
+
                                 attributes.Types0f = "Attributes";
-                                attributes.AttributeName = x.ToString().Substring(30);
-                                if (attributes.AttributeName == "EnumListStringAttribute"
-                                    || attributes.AttributeName == "EnumListCheckAttribute")
+                                info.Name = x.ToString().Substring(30);
+                                if (info.Name == "EnumListStringAttribute"
+                                    || info.Name == "EnumListCheckAttribute")
                                 {
-                                    attributes.AttributeCode = GetModelValue("Code", x);
+                                    info.Code = GetModelValue("Code", x);
                                     if (!entity.ServiceList.Contains("Expands"))
                                     {
                                         entity.ServiceList.Add("Expands");
                                     }
 
                                 }
-                                else if (attributes.AttributeName == "TableToAttribute")
+                                else if (info.Name == "TableToAttribute")
                                 {
                                     if (!entity.ScriptList.Contains("TableToAttribute"))
                                     {
                                         entity.ScriptList.Add("TableToAttribute");
                                     }
 
-                                    attributes.AttributeOne = GetModelValue("TableName", x);
-                                    attributes.AttributeTwo = GetModelValue("Area", x);
-                                    attributes.AttributeThree = GetModelValue("Column", x);
-                                    if (attributes.AttributeTwo != "BaseArea" && !string.IsNullOrEmpty(attributes.AttributeTwo))
+                                    info.One = GetModelValue("TableName", x);
+                                    info.Two = GetModelValue("Area", x);
+                                    info.Three = GetModelValue("Column", x);
+                                    if (info.Two != "BaseArea" && !string.IsNullOrEmpty(info.Two))
                                     {
-                                        if (!entity.ServiceList.Contains(attributes.AttributeTwo))
+                                        if (!entity.ServiceList.Contains(info.Two))
                                         {
-                                            entity.ServiceList.Add(attributes.AttributeTwo);
+                                            entity.ServiceList.Add(info.Two);
                                         }
                                     }
 
                                 }
-                                else if (attributes.AttributeName == "ThumbnailAttribute")
+                                else if (info.Name == "ThumbnailAttribute")
                                 {
-                                    attributes.AttributeOne = GetModelValue("ThumWith", x);
-                                    attributes.AttributeTwo = GetModelValue("ThumHigth", x);
+                                    info.One = GetModelValue("ThumWith", x);
+                                    info.Two = GetModelValue("ThumHigth", x);
                                     entity.IsThumbnail = true;
                                 }
-                                else if (attributes.AttributeName == "TableColumnAttribute")
+                                else if (info.Name == "TableColumnAttribute")
                                 {
-                                    attributes.Types0f = ConvertTypes0f(item.PropertyType.ToString());
+                                   // attributes.Types0f = ConvertTypes0f(item.PropertyType.ToString());
+                                }
+                                if (!attributes.AttributesName.Contains(info.Name))
+                                {
+                                    attributes.AttributesName.Add(info.Name);
+                                    attributes.List.Add(info);
                                 }
 
                             }

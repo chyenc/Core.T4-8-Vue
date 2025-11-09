@@ -203,6 +203,51 @@ public class WebAdminVue
                     sb.AppendLine("                Value = x.Id,");
                     sb.AppendLine("            })];");
                 }
+
+                foreach (var z in y.List)
+                {
+                    switch (z.Name)
+                    {
+                        case "EnumListStringAttribute":
+                            sb.AppendLine($"            if (result.PostModel.{y.Name} == 0) result.PostModel.{y.Name} = null;");
+                            sb.Append($"            result.{y.Name}Select=");
+                            sb.AppendLine("             await expandsService.ShowEnumListVualeHtmlSelectOptionIntCacheAsync(");
+                            sb.Append($"            new ViewModels.Expands.EnumListVualeSearchModel()");
+                            sb.Append("{ EnumListCoding =");
+                            sb.Append($"\"{z.Code}\", State = true");
+                            sb.AppendLine("             }); ");
+                            sb.AppendLine("             ");
+                            break;
+                        case "EnumListCheckAttribute":
+                            sb.AppendLine($"            if (result.PostModel.{y.Name} == 0) result.PostModel.{y.Name} = null;");
+                            sb.Append($"result.{y.Name}Select=");
+                            sb.AppendLine("             await expandsService.ShowEnumListVualeHtmlSelectOptionIntCacheAsync(");
+                            sb.Append($"new ViewModels.Expands.EnumListCheckSearchModel()");
+                            sb.Append("{ EnumListCoding =");
+                            sb.Append($"\"{z.Code}\", TableId= result.Post.Id, State = true");
+                            sb.AppendLine("             }); ");
+                            sb.AppendLine("             ");
+                            break;
+                        case "TableToAttribute":
+                            sb.AppendLine($"            if (result.PostModel.{y.Name} == 0) result.PostModel.Advert{y.Name}isingType = null;");
+                            if (z.Two == "BaseArea" || string.IsNullOrEmpty(z.Two))
+                            {
+                                sb.Append($"var {z.One}List = await {i.Namespace.ToLower()}Service.Show{z.One}ListCacheAsync(new {z.One}SearchModel ");
+                            }
+                            else
+                            {
+                                sb.Append($"var {z.One}List = await {z.Two.ToLower()}Service.Show{z.One}ListCacheAsync(new {z.One}SearchModel ");
+                            }
+                            sb.AppendLine("{ State = true });");
+
+                            sb.Append($"            result.{y.Name}Select = {z.One}List.Select(x => new HtmlSelectOptionInt()");
+                            sb.AppendLine("{");
+                            sb.Append($" Text = x.{z.Three},");
+                            sb.Append($" Value = x.Id");
+                            sb.AppendLine("             }).ToList();");
+                            break;
+                    }
+                }
             }
 
             sb.AppendLine("            if (!(model?.Id > 0))");

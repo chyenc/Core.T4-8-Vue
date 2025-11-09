@@ -55,7 +55,7 @@ namespace MyChy.Core.T4.Template
                         await CreatVideEdit(file, x, i);
 
                         await CreatVideImport(file, x, i);
-                        
+
                     }
                 }
 
@@ -241,8 +241,7 @@ namespace MyChy.Core.T4.Template
                 {
                     sb.AppendLine($"<td>@i.{y.Name}Show</td>");
                 }
-                else if (y.AttributeName == "EnumListStringAttribute" ||
-                    y.AttributeName == "TableToAttribute")
+                else if (y.AttributesName.Contains("EnumListStringAttribute") || y.AttributesName.Contains("TableToAttribute"))
                 {
                     sb.AppendLine($"<td>@i.{y.Name}Show</td>");
                 }
@@ -353,33 +352,36 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine("</div>");
 
                 }
-                else if (y.Types0f == "Attributes" && y.AttributeName != "ThumbnailAttribute")
+                else if (y.Types0f == "Attributes" && y.AttributesName.Contains("ThumbnailAttribute"))
                 {
                     sb.AppendLine("<div class=\"layui-form-item\">");
                     sb.AppendLine($"<label class=\"layui-form-label\">{y.Description}</label>");
                     sb.AppendLine("<div class=\"layui-input-block\">");
 
-                    switch (y.AttributeName)
+                    foreach (var z in y.List)
                     {
-                        case "EnumListStringAttribute":
-                            sb.Append($"<select name=\"{y.Name}\" asp-items=\"Model.{y.Name}Select\" ");
-                            sb.AppendLine($"asp-for=\"Post.{y.Name}\" lay-verify=\"required\" ");
-                            sb.AppendLine($"></select>");
-                            break;
-                        case "EnumListCheckAttribute":
-                            sb.AppendLine($"@foreach (var i in Model.{y.Name}Select) ");
-                            sb.AppendLine("{");
-                            sb.AppendLine($" <input type=\"checkbox\"  name=\"{y.Name}List\" value=\"@i.Value\"  ");
-                            sb.AppendLine("  title=\"@i.Text\" @if (i.Selected) { <text> checked=\"checked\" </text> } >");
-                            sb.AppendLine("}");
+                        switch (z.Name)
+                        {
+                            case "EnumListStringAttribute":
+                                sb.Append($"<select name=\"{y.Name}\" asp-items=\"Model.{y.Name}Select\" ");
+                                sb.AppendLine($"asp-for=\"Post.{y.Name}\" lay-verify=\"required\" ");
+                                sb.AppendLine($"></select>");
+                                break;
+                            case "EnumListCheckAttribute":
+                                sb.AppendLine($"@foreach (var i in Model.{y.Name}Select) ");
+                                sb.AppendLine("{");
+                                sb.AppendLine($" <input type=\"checkbox\"  name=\"{y.Name}List\" value=\"@i.Value\"  ");
+                                sb.AppendLine("  title=\"@i.Text\" @if (i.Selected) { <text> checked=\"checked\" </text> } >");
+                                sb.AppendLine("}");
 
-                            break;
-                        case "TableToAttribute":
-                            sb.Append($"<select name=\"{y.Name}\" asp-items=\"Model.{y.Name}Select\" ");
-                            sb.AppendLine($"asp-for=\"Post.{y.Name}\" lay-verify=\"required\" ");
-                            sb.AppendLine($"xm-select=\"{y.Name}\" xm-select-search=\"\" xm-select-radio=\"true\" xm-select-skin=\"normal\">");
-                            sb.AppendLine($"</select>");
-                            break;
+                                break;
+                            case "TableToAttribute":
+                                sb.Append($"<select name=\"{y.Name}\" asp-items=\"Model.{y.Name}Select\" ");
+                                sb.AppendLine($"asp-for=\"Post.{y.Name}\" lay-verify=\"required\" ");
+                                sb.AppendLine($"xm-select=\"{y.Name}\" xm-select-search=\"\" xm-select-radio=\"true\" xm-select-skin=\"normal\">");
+                                sb.AppendLine($"</select>");
+                                break;
+                        }
                     }
                     sb.AppendLine("</div>");
                     sb.AppendLine("</div>");
@@ -474,8 +476,15 @@ namespace MyChy.Core.T4.Template
                         sb.AppendLine("<input type=\"hidden\" id=\"KeysId\" value=\"@Model.Post.Id\" />");
                         if (x.IsThumbnail)
                         {
-                            sb.AppendLine($"<input type=\"hidden\" id=\"ThumWith\" value=\"{y.AttributeOne}\" />");
-                            sb.AppendLine($"<input type=\"hidden\" id=\"ThumHigth\" value=\"{y.AttributeTwo}\" />");
+                            foreach (var z in y.List)
+                            {
+                                if (z.Name == "ThumbnailAttribute")
+                                {
+                                    sb.AppendLine($"<input type=\"hidden\" id=\"ThumWith\" value=\"{z.One}\" />");
+                                    sb.AppendLine($"<input type=\"hidden\" id=\"ThumHigth\" value=\"{z.Two}\" />");
+                                }
+                            }
+
                         }
                         sb.AppendLine("}");
                     }
