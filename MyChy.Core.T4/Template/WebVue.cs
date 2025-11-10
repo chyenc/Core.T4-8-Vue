@@ -250,6 +250,36 @@ public class WebVue
                 sb.AppendLine("          </t-tag>");
                 sb.AppendLine("        </template>");
             }
+
+            else if (y.Name == "Picture")
+            {
+                sb.AppendLine($"<template #{y.Name}Show=\"slotProps\">");
+                sb.AppendLine("    <t-space :size=\"4\">");
+                sb.AppendLine("        <t-image");
+                sb.AppendLine("            :src=\"slotProps.row.PictureShow\""); // 插入动态变量
+                sb.AppendLine("            :style=\"{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }\"");
+                sb.AppendLine("            fit=\"contain\"");
+                sb.AppendLine("            shape=\"round\"");
+                sb.AppendLine("        />");
+                sb.AppendLine("    </t-space>");
+                sb.AppendLine("</template>");
+            }
+            else
+            {
+                if (y.Types0f == "bool")
+                {
+                    sb.AppendLine($"<template #{y.Name}=\"slotProps\">");
+                    sb.AppendLine("    <t-tag ");
+                    sb.AppendLine($"        :theme=\"slotProps.row.{y.Name} ? 'success' : 'default'\" ");
+                    sb.AppendLine("        variant=\"light\"");
+                    sb.AppendLine("    >");
+                    // 注意：这里的 {{ 和 }} 必须作为字面量添加到 StringBuilder 中
+                    sb.AppendLine($"  {{ slotProps.row.{y.Name} ? t('components.isState.on') : t('components.isState.off') }}");
+                    sb.AppendLine("    </t-tag>");
+                    sb.AppendLine("</template>");
+                }
+            }
+
         }
         sb.AppendLine("      </t-table>");
         sb.AppendLine(" ");
@@ -563,6 +593,43 @@ public class WebVue
                 }
                 else if (y.Name == "Picture")
                 {
+                    // 1. 外部 <t-form-item>
+                    // 注意：C# 字符串中的双引号需要转义 \"
+                    sb.AppendLine("          <t-form-item label=\"图片\" name=\"picture\"> ");
+
+                    // 2. 自定义 <image-upload> 组件
+                    sb.AppendLine("            <image-upload");
+                    sb.AppendLine("              v-model=\"fileList\"");
+                    sb.AppendLine("              :upload-params=\"uploadParams\"");
+                    sb.AppendLine("              :max-size=\"5\"");
+                    sb.AppendLine("              :on-upload-success=\"handleUploadSuccess\"");
+                    sb.AppendLine("            />");
+
+                    // 3. 提示信息 <template #tips>
+                    sb.AppendLine("            <template #tips>");
+                    sb.AppendLine("              <div style=\"color: var(--td-text-color-placeholder); font-size: 12px; margin-top: 4px;\">");
+                    // 注意：内部文本不需要转义
+                    sb.AppendLine("                支持 jpg、png、gif 格式，文件大小不超过 5MB");
+                    sb.AppendLine("              </div>");
+                    sb.AppendLine("            </template>");
+
+                    sb.AppendLine("<t-input v-model=\"formData.picture\" hidden />");
+                    if (i.IsThumbnail)
+                    {
+                        foreach (var z in y.List)
+                        {
+                            if (z.Name == "ThumbnailAttribute")
+                            {
+                                sb.AppendLine($"<input type=\"hidden\" id=\"ThumWith\" value=\"{z.One}\" />");
+                                sb.AppendLine($"<input type=\"hidden\" id=\"ThumHigth\" value=\"{z.Two}\" />");
+                            }
+                        }
+                    }
+                    // 4. 结束 <t-form-item>
+                    sb.AppendLine("</t-form-item>");
+
+
+
                 }
                 else if (y.Name == "Code")
                 {
@@ -594,6 +661,14 @@ public class WebVue
         sb.AppendLine("import { t } from '@/locales';");
         sb.AppendLine($"import {{ {i.Alias}AddInit,{i.Alias}Add }} from '@/api/{FirstCharToLowerCase(ns.Namespace)}';");
         sb.AppendLine("import { commonRules } from '@/utils/validators';");
+        foreach (var y in i.Attributes)
+        {
+            if (y.Name == "Picture")
+            {
+                sb.AppendLine("import ImageUpload from '@/components/image-upload/index.vue'; ");
+
+            }
+        }
 
         sb.AppendLine("// 当前页面权限列表");
         sb.AppendLine("const pagePermissions = ref([]);");
@@ -605,6 +680,16 @@ public class WebVue
         sb.AppendLine("const showErrorMessage = ref(false);");
         sb.AppendLine("const submitLoading = ref(false);");
         sb.AppendLine("const initLoading = ref(false); // 初始化加载状态");
+        foreach (var y in i.Attributes)
+        {
+            if (y.Name == "Picture")
+            {
+                // 4. 文件列表 v-model 绑定
+                // 使用 AppendFormat 插入动态或复杂的内容
+                sb.AppendLine("const file = ref([]);");
+
+            }
+        }
         sb.AppendLine("");
         sb.AppendLine("");
         sb.AppendLine("const rules = ref({");
@@ -641,8 +726,35 @@ public class WebVue
         sb.AppendLine($"        console.log('{i.Alias}DialogAdd-{i.Alias}AddInit-res', res);");
         sb.AppendLine("        formData.value = res.postModel;");
         sb.AppendLine("        resData.value = res;");
-       // sb.AppendLine("        // 保存初始数据快照，用于重置表单");
-       // sb.AppendLine("        //initialFormData.value = JSON.parse(JSON.stringify(res.postModel));");
+
+        foreach (var y in i.Attributes)
+        {
+            if (y.Name == "Picture")
+            {
+                // 1. If 语句块开始
+                sb.AppendLine("    // 处理图片回显");
+                sb.AppendLine("if (res.postModel.pictureShow != null) {");
+                // 2. 赋值 file.value 
+                sb.AppendLine("      file.value = [{");
+                // 3. 设置 url 和 name 属性
+                // 注意：JavaScript 对象中的属性值不需要 C# 的双引号转义，它们本身就是代码
+                sb.AppendLine("        url: res.postModel.pictureShow,");
+                sb.AppendLine("        name: res.postModel.title");
+                // 4. 对象和数组结束
+                sb.AppendLine("      }];");
+                // 5. If 语句块结束
+                sb.AppendLine("    }");
+                // 6. Else 语句块开始
+                sb.AppendLine("    else{");
+                // 7. Else 赋值
+                sb.AppendLine("      file.value = [];");
+                // 8. Else 语句块结束
+                sb.AppendLine("    }");
+            }
+        }
+
+        // sb.AppendLine("        // 保存初始数据快照，用于重置表单");
+        // sb.AppendLine("        //initialFormData.value = JSON.parse(JSON.stringify(res.postModel));");
         sb.AppendLine("        pagePermissions.value = res.permissions || [];");
         sb.AppendLine("     ");
         sb.AppendLine("      } catch (error) {");
@@ -662,11 +774,57 @@ public class WebVue
         sb.AppendLine("  }");
         sb.AppendLine("};");
         sb.AppendLine("");
+        foreach (var y in i.Attributes)
+        {
+            if (y.Name == "Picture")
+            {
+                // 1. computed 属性开始
+                sb.AppendLine("// 上传参数（computed 实现动态更新，从 DOM 元素中读取缩略图参数）");
+                sb.AppendLine("const uploadParams = computed(() => {");
+                sb.AppendLine("  const params = {");
+                sb.AppendLine("    TypeId: 1,");
+                sb.AppendLine("    KeysId: formData.value.id,");
+                sb.AppendLine("  };");
+                sb.AppendLine("  ");
+
+                // 1. 读取缩略图宽度
+                sb.AppendLine("  // 从 DOM 元素中读取缩略图宽度（直接传字符串）");
+                sb.AppendLine("  const thumWidthElement = document.getElementById('ThumWidth');");
+                sb.AppendLine("  if (thumWidthElement && thumWidthElement.value && thumWidthElement.value.trim()) {");
+                sb.AppendLine("    params.ThumWidth = thumWidthElement.value.trim();");
+                sb.AppendLine("  }");
+                sb.AppendLine("  ");
+
+                // 2. 读取缩略图高度
+                sb.AppendLine("  // 从 DOM 元素中读取缩略图高度（直接传字符串）");
+                sb.AppendLine("  const thumHeightElement = document.getElementById('ThumHeight');");
+                sb.AppendLine("  if (thumHeightElement && thumHeightElement.value && thumHeightElement.value.trim()) {");
+                sb.AppendLine("    params.ThumHeight = thumHeightElement.value.trim();");
+                sb.AppendLine("  }");
+
+                // 4. 返回 params
+                sb.AppendLine("  console.log('上传参数:', params);");
+                sb.AppendLine("  return params;");
+                sb.AppendLine("});");
+                sb.AppendLine("");
+
+                // 5. 上传成功回调函数
+                sb.AppendLine("// 上传成功回调");
+                sb.AppendLine("const handleUploadSuccess = (response) => {");
+                sb.AppendLine("  console.log('上传成功，响应:', response);");
+                sb.AppendLine("  if (response.code != null) {");
+                sb.AppendLine("    formData.value.picture = response.code;");
+                sb.AppendLine("  }");
+                sb.AppendLine("};");
+            }
+        }
+
         sb.AppendLine("// 权限判断函数");
         sb.AppendLine("const hasPermission = (permissionCode) => {");
         sb.AppendLine("  return pagePermissions.value.includes(permissionCode);");
         sb.AppendLine("};");
         sb.AppendLine("");
+
         sb.AppendLine("const hasPermissionEdit = () => {");
         sb.AppendLine("  var permissionCode=3;");
         sb.AppendLine("  if(Id>0)  {permissionCode=4};");
