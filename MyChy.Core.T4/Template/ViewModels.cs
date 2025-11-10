@@ -182,8 +182,14 @@ namespace MyChy.Core.T4.Template
                         }
                         else
                         {
-
-                            sb.Append($"public {CheckTypes0f(y.Types0f)} {y.Name}");
+                            if (y.Types0f == "Attributes")
+                            {
+                                sb.Append($"public {CheckTypes0f(y.Types0fYuan)} {y.Name}");
+                            }
+                            else
+                            {
+                                sb.Append($"public {CheckTypes0f(y.Types0f)} {y.Name}");
+                            }
                             sb.AppendLine("{ get; set; }");
                         }
 

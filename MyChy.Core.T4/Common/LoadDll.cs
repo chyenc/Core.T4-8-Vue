@@ -306,7 +306,7 @@ namespace MyChy.Core.T4.Common
                                 }
                                 else if (info.Name == "TableColumnAttribute")
                                 {
-                                   // attributes.Types0f = ConvertTypes0f(item.PropertyType.ToString());
+                                    attributes.Types0fYuan = ConvertTypes0f(item.PropertyType.ToString());
                                 }
                                 if (!attributes.AttributesName.Contains(info.Name))
                                 {
