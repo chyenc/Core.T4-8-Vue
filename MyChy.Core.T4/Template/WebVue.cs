@@ -579,7 +579,9 @@ public class WebVue
 
                 }
                 else if (y.Types0f == "DateTime")
-                { }
+                {
+                    sb.AppendLine($"<t-date-picker  v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" enable-time-picker /> ");
+                }
                 else if (y.Name == "Content")
                 {
                 }
