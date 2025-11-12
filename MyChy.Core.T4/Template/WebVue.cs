@@ -560,89 +560,19 @@ public class WebVue
 
                 if (!issb)
                 {
-                    sb.AppendLine($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" placeholder =\"{y.Description}\"/>");
+                    CreatPagesComponentsAddCheckEdit(sb, y, i.IsThumbnail);
+                    // sb.AppendLine($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" placeholder =\"{y.Description}\"/>");
                 }
             }
-            else if (y.Name == "State")
-            {
-                sb.AppendLine("<t-switch v-model=\"formData.state\" size=\"large\">");
-                sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
-                sb.AppendLine("</t-switch>");
-            }
+            // else if (y.Name == "State")
+            // {
+            //     sb.AppendLine("<t-switch v-model=\"formData.state\" size=\"large\">");
+            //     sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
+            //     sb.AppendLine("</t-switch>");
+            // }
             else
             {
-                if (y.Types0f == "bool")
-                {
-                    sb.AppendLine($"<t-switch v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" size=\"large\">");
-                    sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
-                    sb.AppendLine("</t-switch>");
-
-                }
-                else if (y.Types0f == "DateTime")
-                {
-                    sb.AppendLine($"<t-date-picker  v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" enable-time-picker /> ");
-                }
-                else if (y.Name == "Content")
-                {
-                }
-                else if (y.Name == "Remark" || y.Name == "Remarks" || y.Name == "Introduction")
-                {
-                    sb.AppendLine("<t-textarea");
-                    sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
-                    sb.AppendLine("      placeholder=\"请输入备注，可以为空！\"");
-                    sb.AppendLine("      :maxlength=\"200\"");
-                    sb.AppendLine("    ></t-textarea>");
-                }
-                else if (y.Name == "Picture")
-                {
-                    // 1. 外部 <t-form-item>
-                    // 注意：C# 字符串中的双引号需要转义 \"
-                    sb.AppendLine("          <t-form-item label=\"图片\" name=\"picture\"> ");
-
-                    // 2. 自定义 <image-upload> 组件
-                    sb.AppendLine("            <image-upload");
-                    sb.AppendLine("              v-model=\"fileList\"");
-                    sb.AppendLine("              :upload-params=\"uploadParams\"");
-                    sb.AppendLine("              :max-size=\"5\"");
-                    sb.AppendLine("              :on-upload-success=\"handleUploadSuccess\"");
-                    sb.AppendLine("            />");
-
-                    // 3. 提示信息 <template #tips>
-                    sb.AppendLine("            <template #tips>");
-                    sb.AppendLine("              <div style=\"color: var(--td-text-color-placeholder); font-size: 12px; margin-top: 4px;\">");
-                    // 注意：内部文本不需要转义
-                    sb.AppendLine("                支持 jpg、png、gif 格式，文件大小不超过 5MB");
-                    sb.AppendLine("              </div>");
-                    sb.AppendLine("            </template>");
-
-                    sb.AppendLine("<t-input v-model=\"formData.picture\" hidden />");
-                    if (i.IsThumbnail)
-                    {
-                        foreach (var z in y.List)
-                        {
-                            if (z.Name == "ThumbnailAttribute")
-                            {
-                                sb.AppendLine($"<input type=\"hidden\" id=\"ThumWith\" value=\"{z.One}\" />");
-                                sb.AppendLine($"<input type=\"hidden\" id=\"ThumHigth\" value=\"{z.Two}\" />");
-                            }
-                        }
-                    }
-                    // 4. 结束 <t-form-item>
-                    sb.AppendLine("</t-form-item>");
-
-
-
-                }
-                else if (y.Name == "Code")
-                {
-                    sb.AppendLine($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" :disabled=\"formData.id > 0\"  placeholder =\"{y.Description}\"/>");
-                }
-                else
-                {
-                    sb.AppendLine($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" placeholder =\"{y.Description}\"/>");
-
-
-                }
+                CreatPagesComponentsAddCheckEdit(sb, y, i.IsThumbnail);
             }
             sb.AppendLine("        </t-form-item>");
         }
@@ -916,6 +846,93 @@ public class WebVue
 
         _sw.Close();
 
+    }
+
+    private void CreatPagesComponentsAddCheckEdit(StringBuilder sb, MyChyEntityAttributes y, bool IsThumbnail)
+    {
+        //var sb = new StringBuilder();
+        var maxLength = y.StringLength > 0 ? y.StringLength : 0;
+        if (y.Types0f == "bool")
+        {
+            sb.AppendLine($"<t-switch v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" size=\"large\">");
+            sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
+            sb.AppendLine("</t-switch>");
+
+        }
+        else if (y.Types0f == "DateTime")
+        {
+            sb.AppendLine($"<t-date-picker  v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" enable-time-picker /> ");
+        }
+        else if (y.Name == "Content")
+        {
+        }
+
+        else if (y.Name == "Remark" || y.Name == "Remarks" || y.Name == "Introduction")
+        {
+            maxLength = maxLength == 0 ? 500 : maxLength;
+            sb.AppendLine("<t-textarea");
+            sb.AppendLine($"      v-model=\"formData.{FirstCharToLowerCase(y.Name)}\"");
+            sb.AppendLine("      placeholder=\"请输入备注，可以为空！\"");
+            sb.AppendLine($"      :maxlength=\"{maxLength}\"");
+            sb.AppendLine("    ></t-textarea>");
+        }
+        else if (y.Name == "Picture")
+        {
+            // 1. 外部 <t-form-item>
+            // 注意：C# 字符串中的双引号需要转义 \"
+            sb.AppendLine("          <t-form-item label=\"图片\" name=\"picture\"> ");
+
+            // 2. 自定义 <image-upload> 组件
+            sb.AppendLine("            <image-upload");
+            sb.AppendLine("              v-model=\"fileList\"");
+            sb.AppendLine("              :upload-params=\"uploadParams\"");
+            sb.AppendLine("              :max-size=\"5\"");
+            sb.AppendLine("              :on-upload-success=\"handleUploadSuccess\"");
+            sb.AppendLine("            />");
+
+            // 3. 提示信息 <template #tips>
+            sb.AppendLine("            <template #tips>");
+            sb.AppendLine("              <div style=\"color: var(--td-text-color-placeholder); font-size: 12px; margin-top: 4px;\">");
+            // 注意：内部文本不需要转义
+            sb.AppendLine("                支持 jpg、png、gif 格式，文件大小不超过 5MB");
+            sb.AppendLine("              </div>");
+            sb.AppendLine("            </template>");
+
+            sb.AppendLine("<t-input v-model=\"formData.picture\" hidden />");
+            if (IsThumbnail)
+            {
+                foreach (var z in y.List)
+                {
+                    if (z.Name == "ThumbnailAttribute")
+                    {
+                        sb.AppendLine($"<input type=\"hidden\" id=\"ThumWith\" value=\"{z.One}\" />");
+                        sb.AppendLine($"<input type=\"hidden\" id=\"ThumHigth\" value=\"{z.Two}\" />");
+                    }
+                }
+            }
+            // 4. 结束 <t-form-item>
+            sb.AppendLine("</t-form-item>");
+
+
+
+        }
+        else
+        {
+            sb.Append($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" placeholder =\"{y.Description}\"");
+            if (y.Name == "Code" || y.Name == "Keys")
+            {
+                sb.Append($" :disabled=\"formData.id > 0\" ");
+            }
+
+            else if (maxLength > 0)
+            {
+                sb.Append($" :maxlength=\"{maxLength}\"");
+            }
+
+            sb.AppendLine($" />");
+        }
+
+        //return sb.ToString();
     }
 
     private async Task CreatPagesComponentsSearchPanel(string file, MyChyEntity i, MyChyEntityNamespace ns)

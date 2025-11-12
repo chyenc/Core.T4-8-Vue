@@ -84,7 +84,7 @@ public class WebAdminVue
         sb.AppendLine("    {");
         sb.AppendLine($"        private readonly I{i.Namespace}AdminVueService {i.Namespace.ToLower()}AdminVueService;");
         sb.AppendLine($"        private readonly ICompetencesAdminVueService competencesAdminVueService;");
-        sb.AppendLine($"        private readonly I{i.Namespace}AdminService {i.Namespace.ToLower()}AdminService;");
+        sb.AppendLine($"        //private readonly I{i.Namespace}AdminService {i.Namespace.ToLower()}AdminService;");
         sb.AppendLine($"        private readonly I{i.Namespace}Service {i.Namespace.ToLower()}Service;");
         sb.AppendLine($"        private readonly ITableAdminVueService tableAdminVueService;");
         sb.AppendLine("        private readonly ILogger _logger;");
@@ -101,7 +101,7 @@ public class WebAdminVue
         sb.AppendLine($"             ILoggerFactory loggerFactory,");
         sb.AppendLine($"             ICompetencesAdminVueService _competencesAdminVueService,");
         sb.AppendLine($"             I{i.Namespace}Service _{i.Namespace.ToLower()}Service,");
-        sb.AppendLine($"             I{i.Namespace}AdminService _{i.Namespace.ToLower()}AdminService,");
+        sb.AppendLine($"             //I{i.Namespace}AdminService _{i.Namespace.ToLower()}AdminService,");
         sb.AppendLine($"             I{i.Namespace}AdminVueService _{i.Namespace.ToLower()}AdminVueService,");
         foreach (var y in newservicelist)
         {
@@ -116,7 +116,7 @@ public class WebAdminVue
         sb.AppendLine("            competencesAdminVueService = _competencesAdminVueService;");
         sb.AppendLine($"            {i.Namespace.ToLower()}AdminVueService = _{i.Namespace.ToLower()}AdminVueService;");
         sb.AppendLine($"            {i.Namespace.ToLower()}Service = _{i.Namespace.ToLower()}Service;");
-        sb.AppendLine($"            {i.Namespace.ToLower()}AdminService = _{i.Namespace.ToLower()}AdminService;");
+        sb.AppendLine($"            //{i.Namespace.ToLower()}AdminService = _{i.Namespace.ToLower()}AdminService;");
         sb.AppendLine($"            tableAdminVueService = _tableAdminVueService;");
         foreach (var y in newservicelist)
         {
@@ -229,7 +229,7 @@ public class WebAdminVue
                             sb.AppendLine("             ");
                             break;
                         case "TableToAttribute":
-                            sb.AppendLine($"            if (result.PostModel.{y.Name} == 0) result.PostModel.Advert{y.Name}isingType = null;");
+                            sb.AppendLine($"            if (result.PostModel.{y.Name} == 0) result.PostModel.{y.Name} = null;");
                             if (z.Two == "BaseArea" || string.IsNullOrEmpty(z.Two))
                             {
                                 sb.Append($"var {z.One}List = await {i.Namespace.ToLower()}Service.Show{z.One}ListCacheAsync(new {z.One}SearchModel ");
@@ -242,7 +242,7 @@ public class WebAdminVue
 
                             sb.Append($"            result.{y.Name}Select = {z.One}List.Select(x => new HtmlSelectOptionInt()");
                             sb.AppendLine("{");
-                            sb.Append($" Text = x.{z.Three},");
+                            sb.Append($" Label = x.{z.Three},");
                             sb.Append($" Value = x.Id");
                             sb.AppendLine("             }).ToList();");
                             break;

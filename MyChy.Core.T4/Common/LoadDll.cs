@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Runtime.InteropServices;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyChy.Core.T4.Common
 {
@@ -129,7 +130,6 @@ namespace MyChy.Core.T4.Common
             try
             {
                 assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(modelFile);
-
             }
             catch (FileLoadException)
             {
@@ -243,6 +243,7 @@ namespace MyChy.Core.T4.Common
                             var AttributeName = fullname.Substring(key.Length + 1);
                             entity.CustomAttributeList.Add(AttributeName);
                         }
+                        
 
                     }
 
@@ -260,6 +261,14 @@ namespace MyChy.Core.T4.Common
                             AttributesName = new List<string>(),
 
                         };
+                        if (attributes.Types0f == "string")
+                        {
+                            var lengthAttr = item.Attributes.OfType<StringLengthAttribute>().FirstOrDefault();
+                            if (lengthAttr != null)
+                            {
+                                attributes.StringLength = lengthAttr.MaximumLength / 2;
+                            }
+                        }
                         foreach (var x in item.Attributes)
                         {
                             var leg = x.ToString().IndexOf("MyChy.Core.Domains.Attributes");
@@ -319,6 +328,11 @@ namespace MyChy.Core.T4.Common
                         if (attributes.Types0f == "Enum")
                         {
                             attributes.EnumName = item.PropertyType.ToString().Substring(19);
+                        }
+
+                        else
+                        {
+                            
                         }
                         if (OutAttributes.Contains(item.Name))
                         {

@@ -81,6 +81,8 @@ namespace MyChy.Core.T4.Common
 
         public string? Types0f { get; set; }
 
+        public int   StringLength { get; set; }
+
         public string? Types0fYuan { get; set; }
 
         public string? EnumName { get; set; }
