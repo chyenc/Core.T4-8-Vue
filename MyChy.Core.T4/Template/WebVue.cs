@@ -274,7 +274,9 @@ public class WebVue
                     sb.AppendLine("        variant=\"light\"");
                     sb.AppendLine("    >");
                     // 注意：这里的 {{ 和 }} 必须作为字面量添加到 StringBuilder 中
-                    sb.AppendLine($"  {{ slotProps.row.{y.Name} ? t('components.isState.on') : t('components.isState.off') }}");
+                    sb.Append("  {{  ");
+                    sb.Append($"slotProps.row.{y.Name} ? ");
+                    sb.AppendLine("t('components.isState.on') : t('components.isState.off') }}");
                     sb.AppendLine("    </t-tag>");
                     sb.AppendLine("</template>");
                 }
@@ -921,7 +923,7 @@ public class WebVue
             sb.Append($" <t-input v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" placeholder =\"{y.Description}\"");
             if (y.Name == "Code" || y.Name == "Keys")
             {
-                sb.Append($" :disabled=\"formData.id > 0\" ");
+                sb.Append($"show-limit-number  :disabled=\"formData.id > 0\" ");
             }
 
             else if (maxLength > 0)

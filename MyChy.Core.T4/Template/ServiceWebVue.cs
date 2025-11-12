@@ -163,7 +163,7 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine($"private readonly ILogger _logger;");
                 sb.AppendLine("//private readonly IGeneralCacheServer generalCacheServer;");
                 sb.AppendLine("private readonly IRedisCachesService redisCachesService;");
-                sb.AppendLine($"private readonly ICommonUseAdminService commonUseAdminService;");
+                sb.AppendLine($"private readonly ICommonUseAdminVueService  commonUseAdminVueService;");
                 sb.AppendLine($"//private readonly IExcelService excelService;");  
                 sb.AppendLine($"private readonly string CacheKey = \"{i.Namespace}WS_\";");
 
@@ -172,14 +172,14 @@ namespace MyChy.Core.T4.Template
                 sb.AppendLine("//, IGeneralCacheServer _generalCacheServer");
                 sb.AppendLine("//, IExcelService _excelService");
                 sb.AppendLine(", IRedisCachesService _redisCachesService");
-                sb.AppendLine(", ICommonUseAdminService _commonUseAdminService)");
+                sb.AppendLine(", ICommonUseAdminVueService _commonUseAdminVueService)");
                 sb.AppendLine("{");
                 sb.AppendLine($"{i.Namespace.ToLower()}Service = _{i.Namespace.ToLower()}Service;");
                 sb.AppendLine("//generalCacheServer = _generalCacheServer;");
                 sb.AppendLine("redisCachesService = _redisCachesService;");
                 sb.AppendLine("//excelService = _excelService;");
                 sb.AppendLine($"_logger = loggerFactory.CreateLogger<{i.Namespace}AdminService>();");
-                sb.AppendLine($"commonUseAdminService = _commonUseAdminService;");
+                sb.AppendLine($"commonUseAdminVueService = _commonUseAdminVueService;");
                 sb.AppendLine("}");
 
 
@@ -222,8 +222,8 @@ namespace MyChy.Core.T4.Template
                     sb.AppendLine($"result.Msg = \"Excel 文件必须上传\"; return result;");
                     sb.AppendLine("}");
                     sb.AppendLine($"");
-                    sb.AppendLine($"var fileinfo = await commonUseAdminService.ShowUploadFiles(PostModel.Content);");
-                    sb.AppendLine($"var filepath = commonUseAdminService.ShowConfigFilePath(fileinfo.Code);");
+                    sb.AppendLine($"var fileinfo = await commonUseAdminVueService.ShowUploadFiles(PostModel.Content);");
+                    sb.AppendLine($"var filepath = commonUseAdminVueService.ShowConfigFilePath(fileinfo.Code);");
                     sb.AppendLine($"");
                     sb.AppendLine($"//var resultBaseT = excelService.Import<{x.Name}ExcelModel>(filepath.Msg);");
                     sb.AppendLine($"//if (resultBaseT.Success)");
