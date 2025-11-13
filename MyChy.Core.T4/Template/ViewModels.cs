@@ -130,6 +130,29 @@ namespace MyChy.Core.T4.Template
                                 sb.Append($"public string? {y.Name}Href ");
                                 sb.AppendLine("{ get; set; }");
 
+                                // --- 格式化 UploadtypeId ---
+                                sb.AppendLine("/// <summary>");
+                                sb.AppendLine("/// 图片类型");
+                                sb.AppendLine("/// </summary>");
+                                sb.AppendLine("[Description(\"图片类型\")]");
+                                sb.AppendLine("public int UploadtypeId { get; set; }");
+                                sb.AppendLine(); // 添加空行分隔
+
+                                // --- 格式化 ThumWidth ---
+                                sb.AppendLine("/// <summary>");
+                                sb.AppendLine("/// 缩略图宽");
+                                sb.AppendLine("/// </summary>");
+                                sb.AppendLine("[Description(\"缩略图宽\")]");
+                                sb.AppendLine("public string? ThumWidth { get; set; }");
+                                sb.AppendLine(); // 添加空行分隔
+
+                                // --- 格式化 ThumHeight ---
+                                sb.AppendLine("/// <summary>");
+                                sb.AppendLine("/// 缩略图高");
+                                sb.AppendLine("/// </summary>");
+                                sb.AppendLine("[Description(\"缩略图高\")]");
+                                sb.AppendLine("public string? ThumHeight { get; set; }");
+
                             }
                             else if (y.Types0f == "DateTime")
                             {

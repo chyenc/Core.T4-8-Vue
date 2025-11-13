@@ -203,6 +203,21 @@ public class WebAdminVue
                     sb.AppendLine("                Value = x.Id,");
                     sb.AppendLine("            })];");
                 }
+                else if (y.Name == "Picture")
+                {
+                    sb.AppendLine("result.PostModel.UploadtypeId = (int)UploadType.Advertising;");
+                    if (x.IsThumbnail)
+                    {
+                        foreach (var z in y.List)
+                        {
+                            if (z.Name == "ThumbnailAttribute")
+                            {
+                                sb.AppendLine("result.PostModel.ThumWidth = \"{z.One}\";");
+                                sb.AppendLine("result.PostModel.ThumHeight = \"{z.Two}\";");
+                             }
+                        }
+                    }
+                }
 
                 foreach (var z in y.List)
                 {

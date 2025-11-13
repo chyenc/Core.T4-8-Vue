@@ -716,25 +716,12 @@ public class WebVue
                 sb.AppendLine("// 上传参数（computed 实现动态更新，从 DOM 元素中读取缩略图参数）");
                 sb.AppendLine("const uploadParams = computed(() => {");
                 sb.AppendLine("  const params = {");
-                sb.AppendLine("    TypeId: 1,");
+                sb.AppendLine("    TypeId: formData.value.uploadtypeId,");
                 sb.AppendLine("    KeysId: formData.value.id,");
+                sb.AppendLine("    ThumWidth: formData.value.thumWidth,");
+                sb.AppendLine("    ThumHeight: formData.value.thumHeight,");
                 sb.AppendLine("  };");
                 sb.AppendLine("  ");
-
-                // 1. 读取缩略图宽度
-                sb.AppendLine("  // 从 DOM 元素中读取缩略图宽度（直接传字符串）");
-                sb.AppendLine("  const thumWidthElement = document.getElementById('ThumWidth');");
-                sb.AppendLine("  if (thumWidthElement && thumWidthElement.value && thumWidthElement.value.trim()) {");
-                sb.AppendLine("    params.ThumWidth = thumWidthElement.value.trim();");
-                sb.AppendLine("  }");
-                sb.AppendLine("  ");
-
-                // 2. 读取缩略图高度
-                sb.AppendLine("  // 从 DOM 元素中读取缩略图高度（直接传字符串）");
-                sb.AppendLine("  const thumHeightElement = document.getElementById('ThumHeight');");
-                sb.AppendLine("  if (thumHeightElement && thumHeightElement.value && thumHeightElement.value.trim()) {");
-                sb.AppendLine("    params.ThumHeight = thumHeightElement.value.trim();");
-                sb.AppendLine("  }");
 
                 // 4. 返回 params
                 sb.AppendLine("  console.log('上传参数:', params);");
@@ -901,17 +888,6 @@ public class WebVue
             sb.AppendLine("            </template>");
 
             sb.AppendLine("<t-input v-model=\"formData.picture\" hidden />");
-            if (IsThumbnail)
-            {
-                foreach (var z in y.List)
-                {
-                    if (z.Name == "ThumbnailAttribute")
-                    {
-                        sb.AppendLine($"<input type=\"hidden\" id=\"ThumWith\" value=\"{z.One}\" />");
-                        sb.AppendLine($"<input type=\"hidden\" id=\"ThumHigth\" value=\"{z.Two}\" />");
-                    }
-                }
-            }
             // 4. 结束 <t-form-item>
             sb.AppendLine("</t-form-item>");
 
