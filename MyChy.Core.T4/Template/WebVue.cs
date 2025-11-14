@@ -841,14 +841,17 @@ public class WebVue
     {
         //var sb = new StringBuilder();
         var maxLength = y.StringLength > 0 ? y.StringLength : 0;
-        if (y.Types0f == "bool")
+        var Types0f = y.Types0f;
+        if(Types0f=="Attributes"){  Types0f=y.Types0fYuan; }
+        
+        if (Types0f == "bool")
         {
             sb.AppendLine($"<t-switch v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" size=\"large\">");
             sb.AppendLine("<template #label=\"slotProps\">{{ slotProps.value ? t('components.isState.on') : t('components.isState.off') }}</template>");
             sb.AppendLine("</t-switch>");
 
         }
-        else if (y.Types0f == "DateTime")
+        else if (Types0f == "DateTime")
         {
             sb.AppendLine($"<t-date-picker  v-model=\"formData.{FirstCharToLowerCase(y.Name)}\" enable-time-picker /> ");
         }

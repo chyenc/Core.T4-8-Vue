@@ -29,8 +29,6 @@ namespace MyChy.Core.T4.Template
             sb.AppendLine("生成成功");
             await _sw.WriteAsync(sb.ToString());
             _sw.Close();
-
-
         }
     }
 }
