@@ -821,7 +821,7 @@ namespace MyChy.Core.T4.Template
                             sb.AppendLine($"public async Task<ResultBaseModel> Delete{x.Name}PostAsync({x.Name}SearchModel Search)");
                             sb.AppendLine("{");
                             sb.AppendLine("var result = new ResultBaseModel();");
-                            sb.AppendLine($"var userinfo = await commonService.ShowAdminUserInfoAsync({x.Name}SearchModel.BaseLoginName);");
+                            sb.AppendLine($"var userinfo = await commonService.ShowAdminUserInfoAsync(Search.BaseLoginName);");
 
                             sb.AppendLine($"var Model = await _{i.Namespace}Work.{x.Name}R.GetByIdAsync(Search.Id);");
 
